@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme Variables — DeLAPLAK custom design system (deviation 6: original palette, not delaplak.com's).
+   Single white/light design — no dark mode. */
+:root {
+  color-scheme: light;
+  --background: 0 0% 100%;
+  --foreground: 222 20% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 20% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 20% 12%;
+  --primary: 170 62% 24%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 32 45% 55%;
+  --secondary-foreground: 24 30% 12%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 16% 40%;
+  --accent: 32 45% 92%;
+  --accent-foreground: 170 62% 18%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 20% 89%;
+  --input: 214 20% 89%;
+  --ring: 170 62% 24%;
+  --radius: 0.625rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply bg-background text-foreground;
+    -ms-overflow-style: none;
+    scrollbar-width: thin;
+  }
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  #root {
+    min-height: 100vh;
+  }
+  a {
+    color: inherit;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+[dir="rtl"] .ltr-force {
+  direction: ltr;
+}
+
+/* Utility: product grid card hover */
+.product-card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Focus-visible accessible ring, used alongside Antd's own focus styles */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}

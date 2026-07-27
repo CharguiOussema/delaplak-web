@@ -1,0 +1,118 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { Button, Empty, InputNumber, Spin, App as AntdApp, Popconfirm } from "antd";
+import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
+import { cartService } from "../../services/CartService";
+import { queryKeys } from "../../services/QueryClientManager";
+import { useApp } from "../../hooks";
+import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
+import { API_URL } from "../../constants";
+import { getErrorMessage } from "../../utils/errorHandling";
+import type { Cart } from "../../models/entities";
+
+export const CartPage = () => {
+  const { t } = useTranslation();
+  const { language } = useApp();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { message } = AntdApp.useApp();
+
+  const { data: cart, isLoading } = useQuery({
+    queryKey: [queryKeys.CART],
+    queryFn: () => cartService.getCart(),
+  });
+
+  const invalidate = () => queryClient.invalidateQueries([queryKeys.CART]);
+
+  const updateQty = useMutation<Cart, unknown, { productId: string; quantity: number }>({
+    mutationFn: ({ productId, quantity }) => cartService.setItemQuantity(productId, quantity),
+    onSuccess: invalidate,
+    onError: (err) => { message.error(getErrorMessage(err)); },
+  });
+
+  const removeItem = useMutation<Cart, unknown, string>({
+    mutationFn: (productId: string) => cartService.removeItem(productId),
+    onSuccess: invalidate,
+    onError: (err) => { message.error(getErrorMessage(err)); },
+  });
+
+  const clearCart = useMutation<Cart, unknown, void>({
+    mutationFn: () => cartService.clear(),
+    onSuccess: invalidate,
+    onError: (err) => { message.error(getErrorMessage(err)); },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-24">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const items = cart?.items ?? [];
+  const total = items.reduce((sum, it) => sum + it.product.price * it.quantity, 0);
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
+      <h1 className="text-2xl font-bold mb-6">{t("cart.title")}</h1>
+
+      {items.length === 0 ? (
+        <Empty description={t("cart.empty")}>
+          <Link to="/">
+            <Button type="primary">{t("cart.continueShopping")}</Button>
+          </Link>
+        </Empty>
+      ) : (
+        <>
+          <div className="divide-y divide-border border border-border rounded-lg overflow-hidden bg-card">
+            {items.map((item) => (
+              <div key={item.product._id} className="flex items-center gap-4 p-4">
+                <Link to={`/products/${item.product._id}`} className="w-20 h-20 shrink-0 bg-muted rounded-md overflow-hidden">
+                  {item.product.images[0] && (
+                    <img src={imageUrl(API_URL, item.product.images[0])} alt="" className="w-full h-full object-cover" />
+                  )}
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link to={`/products/${item.product._id}`} className="font-medium hover:text-primary line-clamp-1">
+                    {localize(item.product.name, language)}
+                  </Link>
+                  <div className="text-sm text-muted-foreground">{formatPrice(item.product.price, item.product.currency)}</div>
+                </div>
+                <InputNumber
+                  min={1}
+                  max={item.product.stock}
+                  value={item.quantity}
+                  onChange={(v) => v && updateQty.mutate({ productId: item.product._id, quantity: v })}
+                />
+                <div className="w-24 text-end font-semibold">{formatPrice(item.product.price * item.quantity, item.product.currency)}</div>
+                <Button
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => removeItem.mutate(item.product._id)}
+                  loading={removeItem.isLoading}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between mt-6">
+            <Popconfirm title={t("cart.clearConfirm")} onConfirm={() => clearCart.mutate()}>
+              <Button danger>{t("cart.clear")}</Button>
+            </Popconfirm>
+            <div className="text-end">
+              <div className="text-lg font-semibold mb-2">
+                {t("cart.total")}: {formatPrice(total, items[0]?.product.currency || "MAD")}
+              </div>
+              <Button type="primary" size="large" icon={<ShoppingOutlined />} onClick={() => navigate("/checkout")}>
+                {t("cart.checkout")}
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
