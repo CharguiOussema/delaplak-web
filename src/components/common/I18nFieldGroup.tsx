@@ -7,13 +7,21 @@ interface I18nFieldGroupProps<T extends FieldValues> {
   namePrefix: string;
   label: string;
   multiline?: boolean;
+  /**
+   * Minimum number of the 3 languages that must be filled in.
+   * Defaults to requiring ALL 3 (the historical behavior). Pass 0 to make the whole
+   * group optional, or 1 to require at least one language (e.g. Category name/description,
+   * where the backend auto-fills the rest from whichever language was provided).
+   */
+  minRequired?: number;
 }
 
 const LANGS = ["en", "fr", "ar"] as const;
 const LANG_LABELS: Record<(typeof LANGS)[number], string> = { en: "English", fr: "Français", ar: "العربية" };
 
-export function I18nFieldGroup<T extends FieldValues>({ control, namePrefix, label, multiline }: I18nFieldGroupProps<T>) {
+export function I18nFieldGroup<T extends FieldValues>({ control, namePrefix, label, multiline, minRequired = 3 }: I18nFieldGroupProps<T>) {
   const { t } = useTranslation();
+  const relaxed = minRequired < 3;
 
   return (
     <div className="mb-4">
@@ -27,7 +35,21 @@ export function I18nFieldGroup<T extends FieldValues>({ control, namePrefix, lab
             <Controller
               name={`${namePrefix}.${lang}` as Path<T>}
               control={control}
-              rules={{ required: t("validation.required") as string }}
+              rules={
+                relaxed
+                  ? minRequired > 0
+                    ? {
+                        validate: (_value, formValues) => {
+                          const group = (formValues as Record<string, unknown>)[namePrefix] as
+                            | Record<string, unknown>
+                            | undefined;
+                          const filled = LANGS.filter((l) => String(group?.[l] ?? "").trim().length > 0).length;
+                          return filled >= minRequired || (t("validation.atLeastOneLanguage") as string);
+                        },
+                      }
+                    : {}
+                  : { required: t("validation.required") as string }
+              }
               render={({ field, fieldState }) => (
                 <div>
                   {multiline ? (
@@ -44,4 +66,20 @@ export function I18nFieldGroup<T extends FieldValues>({ control, namePrefix, lab
       />
     </div>
   );
+}
+
+/** Converts empty/untouched language inputs to `undefined` so the backend's
+ * first-non-empty-wins auto-fill logic works correctly (an explicit "" would defeat it). */
+export function cleanI18nText(
+  value: Partial<Record<(typeof LANGS)[number], string>> | undefined,
+): Partial<Record<(typeof LANGS)[number], string>> | undefined {
+  if (!value) return undefined;
+  const cleaned: Partial<Record<(typeof LANGS)[number], string>> = {};
+  for (const lang of LANGS) {
+    const v = value[lang];
+    if (typeof v === "string" && v.trim().length > 0) {
+      cleaned[lang] = v;
+    }
+  }
+  return Object.keys(cleaned).length > 0 ? cleaned : undefined;
 }

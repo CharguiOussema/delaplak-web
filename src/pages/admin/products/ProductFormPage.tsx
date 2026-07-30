@@ -3,16 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Button, Card, Input, InputNumber, Select, Alert, Spin, App as AntdApp, Upload, Image, type UploadProps } from "antd";
-import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
+import { UploadOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useApp } from "../../../hooks";
 import { productService } from "../../../services/ProductService";
 import { categoryService } from "../../../services/CategoryService";
 import { queryKeys } from "../../../services/QueryClientManager";
 import { I18nFieldGroup } from "../../../components/common/I18nFieldGroup";
+import { QuickAddCategoryModal } from "../../../components/common/QuickAddCategoryModal";
 import { getErrorMessage } from "../../../utils/errorHandling";
-import { imageUrl } from "../../../utils/i18nText";
+import { imageUrl, localize } from "../../../utils/i18nText";
 import { API_URL } from "../../../constants";
-import type { I18nText, Product } from "../../../models/entities";
+import type { I18nText, Product, Category } from "../../../models/entities";
+import type { FilterOption } from "../../../models/ResponseType";
 
 interface ProductFormValues {
   name: I18nText;
@@ -23,7 +26,7 @@ interface ProductFormValues {
   thickness: string;
   texture: string;
   applicationDomains: string;
-  category: string;
+  categories: string[];
   stock: number;
 }
 
@@ -31,10 +34,13 @@ export const ProductFormPage = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { t } = useTranslation();
+  const { language } = useApp();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { message } = AntdApp.useApp();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [extraCategoryOptions, setExtraCategoryOptions] = useState<FilterOption[]>([]);
 
   const { data: existing, isLoading } = useQuery({
     queryKey: [queryKeys.PRODUCTS, id],
@@ -46,6 +52,18 @@ export const ProductFormPage = () => {
     queryKey: [queryKeys.CATEGORIES_FILTER],
     queryFn: () => categoryService.filter(),
   });
+
+  // A product can reference a category that was later renamed/soft-deleted — categoryService.filter()
+  // only returns non-deleted categories, so without this an already-selected-but-now-deleted category
+  // would have no matching option and rc-select would fall back to showing its raw id.
+  const existingCategoryOptions: FilterOption[] = (existing?.categories ?? [])
+    .filter((c): c is Category => typeof c === "object")
+    .map((c) => ({ label: c.isDeleted ? `${localize(c.name, language)} (${t("categories.deleted")})` : localize(c.name, language), value: c._id }));
+
+  const allCategoryOptions = [categoryOptions, extraCategoryOptions, existingCategoryOptions].reduce<FilterOption[]>(
+    (acc, list) => [...acc, ...(list ?? []).filter((o) => !acc.some((existingOpt) => existingOpt.value === o.value))],
+    [],
+  );
 
   const {
     control,
@@ -59,12 +77,12 @@ export const ProductFormPage = () => {
       name: { en: "", fr: "", ar: "" },
       description: { en: "", fr: "", ar: "" },
       price: 0,
-      currency: "MAD",
+      currency: "TND",
       dimensions: "",
       thickness: "",
       texture: "",
       applicationDomains: "",
-      category: "",
+      categories: [],
       stock: 0,
     },
   });
@@ -80,7 +98,7 @@ export const ProductFormPage = () => {
         thickness: existing.thickness,
         texture: existing.texture,
         applicationDomains: existing.applicationDomains.join(", "),
-        category: typeof existing.category === "object" ? existing.category._id : existing.category,
+        categories: existing.categories.map((c) => (typeof c === "object" ? c._id : c)),
         stock: existing.stock,
       });
     }
@@ -100,7 +118,7 @@ export const ProductFormPage = () => {
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
-        category: values.category,
+        categories: values.categories,
         stock: values.stock,
       };
       return isEdit ? productService.update(id!, payload) : productService.create(payload);
@@ -206,15 +224,43 @@ export const ProductFormPage = () => {
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">{t("products.category")}</label>
-            <Select
-              className="w-full"
-              placeholder={t("products.selectCategory") as string}
-              options={categoryOptions}
-              value={watch("category") || undefined}
-              onChange={(v) => setValue("category", v)}
-            />
-            {errors.category && <p className="text-destructive text-xs mt-1">{t("validation.required")}</p>}
+            <div className="flex gap-2">
+              <Controller
+                name="categories"
+                control={control}
+                rules={{ validate: (v) => (v && v.length > 0) || (t("validation.required") as string) }}
+                render={({ field }) => (
+                  <Select
+                    // Remounts once category options finish loading — otherwise a value set
+                    // before its matching option exists gets permanently rendered as the raw
+                    // id (rc-select caches the label the first time it sees an unmatched value).
+                    key={categoryOptions ? "loaded" : "loading"}
+                    {...field}
+                    mode="multiple"
+                    className="w-full"
+                    loading={!categoryOptions}
+                    placeholder={t("products.selectCategory") as string}
+                    options={allCategoryOptions}
+                  />
+                )}
+              />
+              <Button icon={<PlusOutlined />} onClick={() => setQuickAddOpen(true)}>
+                {t("categories.quickAddButton")}
+              </Button>
+            </div>
+            {errors.categories && <p className="text-destructive text-xs mt-1">{errors.categories.message ?? t("validation.required")}</p>}
           </div>
+
+          <QuickAddCategoryModal
+            open={quickAddOpen}
+            onClose={() => setQuickAddOpen(false)}
+            onCreated={(category: Category) => {
+              setExtraCategoryOptions((prev) => [...prev, { label: localize(category.name, language), value: category._id }]);
+              setValue("categories", [...watch("categories"), category._id], { shouldValidate: true });
+              message.success(t("categories.quickAddSuccess"));
+              setQuickAddOpen(false);
+            }}
+          />
 
           <div className="flex gap-3 pt-2">
             <Button type="primary" htmlType="submit" loading={mutation.isLoading}>

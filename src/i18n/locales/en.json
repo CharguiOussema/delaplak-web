@@ -34,6 +34,7 @@
 
   "validation.required": "This field is required",
   "validation.minLength": "Must be at least {{count}} characters",
+  "validation.atLeastOneLanguage": "At least one language must be filled in",
 
   "common.actions": "Actions",
   "common.back": "Back",
@@ -86,6 +87,10 @@
   "orders.confirmConfirm": "Confirm this order? An invoice will be generated.",
   "orders.confirmSuccess": "Order confirmed and invoice generated",
   "orders.notFound": "Order not found",
+  "orders.cancel": "Cancel order",
+  "orders.cancelConfirm": "Cancel this order? This cannot be undone.",
+  "orders.cancelSuccess": "Order cancelled",
+  "orders.cancelledAt": "Cancelled at",
 
   "invoices.number": "Invoice number",
   "invoices.issuedAt": "Issued at",
@@ -132,6 +137,12 @@
   "categories.updateSuccess": "Category updated",
   "categories.deleteConfirm": "Delete this category?",
   "categories.deleteSuccess": "Category deleted",
+  "categories.description": "Description",
+  "categories.quickAddTitle": "Add category",
+  "categories.quickAddButton": "Add category",
+  "categories.quickAddSubmit": "Create",
+  "categories.quickAddSuccess": "Category created",
+  "categories.deleted": "deleted",
 
   "products.name": "Name",
   "products.description": "Description",

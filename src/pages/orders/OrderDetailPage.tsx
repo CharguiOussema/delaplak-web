@@ -1,11 +1,11 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Spin, Result, Button, Tag, Card, Descriptions, App as AntdApp, Popconfirm } from "antd";
-import { CheckCircleOutlined, FileTextOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { orderService } from "../../services/OrderService";
 import { queryKeys } from "../../services/QueryClientManager";
-import { useApp, useAccess } from "../../hooks";
+import { useApp, useAccess, useAuth } from "../../hooks";
 import { localize, formatPrice } from "../../utils/i18nText";
 import { getErrorMessage } from "../../utils/errorHandling";
 import { ORDER_STATUS } from "../../models/consts";
@@ -22,6 +22,7 @@ export const OrderDetailPage = () => {
   const { t } = useTranslation();
   const { language } = useApp();
   const { canWrite } = useAccess();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { message } = AntdApp.useApp();
@@ -42,6 +43,16 @@ export const OrderDetailPage = () => {
     onError: (err) => { message.error(getErrorMessage(err)); },
   });
 
+  const cancelOrder = useMutation<Order, unknown, void>({
+    mutationFn: () => orderService.cancel(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries([queryKeys.ORDERS]);
+      queryClient.invalidateQueries([queryKeys.ORDERS, id]);
+      message.success(t("orders.cancelSuccess"));
+    },
+    onError: (err) => { message.error(getErrorMessage(err)); },
+  });
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-24">
@@ -54,7 +65,13 @@ export const OrderDetailPage = () => {
     return <Result status="404" title={t("orders.notFound")} extra={<Link to="/orders">{t("orders.title")}</Link>} />;
   }
 
-  const canConfirm = canWrite("orders") && order.status === ORDER_STATUS.PENDING;
+  const isPending = order.status === ORDER_STATUS.PENDING;
+  const isOwnOrder = typeof order.client === "object" ? order.client._id === user?._id : order.client === user?._id;
+  // Confirming needs staff verification, so it stays ADMIN-only. Cancelling is looser:
+  // ADMIN can cancel any pending order, and a CLIENT can back out of their own before
+  // it's confirmed — mirrors the ADMIN-or-owner rule already enforced server-side.
+  const canConfirm = canWrite("orders") && isPending;
+  const canCancel = (canWrite("orders") || isOwnOrder) && isPending;
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
@@ -76,6 +93,9 @@ export const OrderDetailPage = () => {
           {order.confirmedAt && (
             <Descriptions.Item label={t("orders.confirmedAt")}>{new Date(order.confirmedAt).toLocaleString(language)}</Descriptions.Item>
           )}
+          {order.cancelledAt && (
+            <Descriptions.Item label={t("orders.cancelledAt")}>{new Date(order.cancelledAt).toLocaleString(language)}</Descriptions.Item>
+          )}
         </Descriptions>
       </Card>
 
@@ -86,16 +106,16 @@ export const OrderDetailPage = () => {
               <div>
                 <div className="font-medium">{localize(item.name, language)}</div>
                 <div className="text-sm text-muted-foreground">
-                  {item.quantity} × {formatPrice(item.price, "MAD")}
+                  {item.quantity} × {formatPrice(item.price, item.currency)}
                 </div>
               </div>
-              <div className="font-semibold">{formatPrice(item.price * item.quantity, "MAD")}</div>
+              <div className="font-semibold">{formatPrice(item.price * item.quantity, item.currency)}</div>
             </div>
           ))}
         </div>
         <div className="flex justify-between items-center pt-4 mt-2 border-t border-border text-lg font-semibold">
           <span>{t("checkout.total")}</span>
-          <span>{formatPrice(order.totalAmount, "MAD")}</span>
+          <span>{formatPrice(order.totalAmount, order.currency)}</span>
         </div>
       </Card>
 
@@ -104,6 +124,13 @@ export const OrderDetailPage = () => {
           <Popconfirm title={t("orders.confirmConfirm")} onConfirm={() => confirmOrder.mutate()}>
             <Button type="primary" icon={<CheckCircleOutlined />} loading={confirmOrder.isLoading}>
               {t("orders.confirm")}
+            </Button>
+          </Popconfirm>
+        )}
+        {canCancel && (
+          <Popconfirm title={t("orders.cancelConfirm")} onConfirm={() => cancelOrder.mutate()}>
+            <Button danger icon={<CloseCircleOutlined />} loading={cancelOrder.isLoading}>
+              {t("orders.cancel")}
             </Button>
           </Popconfirm>
         )}

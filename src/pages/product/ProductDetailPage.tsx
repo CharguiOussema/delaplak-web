@@ -52,7 +52,7 @@ export const ProductDetailPage = () => {
     return <Result status="404" title={t("product.notFound")} extra={<Link to="/">{t("catalog.title")}</Link>} />;
   }
 
-  const category = typeof product.category === "object" ? (product.category as Category) : null;
+  const category = product.categories.find((c): c is Category => typeof c === "object") ?? null;
   const isClient = user?.role === USER_ROLES.CLIENT;
 
   return (

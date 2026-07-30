@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
-import { Table, Tag, type TableProps } from "antd";
+import { Table, Tag, Button, type TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { orderService } from "../../services/OrderService";
 import { queryKeys } from "../../services/QueryClientManager";
@@ -46,7 +46,7 @@ export const OrdersListPage = () => {
     {
       title: t("orders.total"),
       dataIndex: "totalAmount",
-      render: (v: number) => formatPrice(v, "MAD"),
+      render: (v: number, r: Order) => formatPrice(v, r.currency),
     },
     {
       title: t("orders.status"),
@@ -57,6 +57,14 @@ export const OrdersListPage = () => {
       title: t("orders.date"),
       dataIndex: "createdAt",
       render: (d: string) => new Date(d).toLocaleDateString(language),
+    },
+    {
+      title: t("common.actions"),
+      render: (_: unknown, row: Order) => (
+        <Link to={`/orders/${row._id}`}>
+          <Button size="small">{t("common.view")}</Button>
+        </Link>
+      ),
     },
   ];
 

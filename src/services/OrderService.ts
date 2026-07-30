@@ -27,6 +27,10 @@ class OrderService {
   async confirm(id: string): Promise<{ order: Order; invoice: Invoice }> {
     return apiService.patch<{ order: Order; invoice: Invoice }>(`${this.base}/${id}/confirm`);
   }
+
+  async cancel(id: string): Promise<Order> {
+    return apiService.patch<Order>(`${this.base}/${id}/cancel`);
+  }
 }
 
 export const orderService = new OrderService();

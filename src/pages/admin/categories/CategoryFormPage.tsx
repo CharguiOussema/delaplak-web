@@ -6,12 +6,13 @@ import { Button, Card, Select, Alert, Spin, App as AntdApp } from "antd";
 import { useTranslation } from "react-i18next";
 import { categoryService } from "../../../services/CategoryService";
 import { queryKeys } from "../../../services/QueryClientManager";
-import { I18nFieldGroup } from "../../../components/common/I18nFieldGroup";
+import { I18nFieldGroup, cleanI18nText } from "../../../components/common/I18nFieldGroup";
 import { getErrorMessage } from "../../../utils/errorHandling";
 import type { I18nText } from "../../../models/entities";
 
 interface CategoryFormValues {
   name: I18nText;
+  description: I18nText;
   parent?: string;
 }
 
@@ -41,17 +42,29 @@ export const CategoryFormPage = () => {
     reset,
     setValue,
     watch,
-  } = useForm<CategoryFormValues>({ defaultValues: { name: { en: "", fr: "", ar: "" }, parent: undefined } });
+  } = useForm<CategoryFormValues>({
+    defaultValues: { name: { en: "", fr: "", ar: "" }, description: { en: "", fr: "", ar: "" }, parent: undefined },
+  });
 
   useEffect(() => {
     if (existing) {
-      reset({ name: existing.name, parent: existing.parent ?? undefined });
+      reset({
+        name: existing.name,
+        description: existing.description ?? { en: "", fr: "", ar: "" },
+        parent: existing.parent ?? undefined,
+      });
     }
   }, [existing, reset]);
 
   const mutation = useMutation({
-    mutationFn: (values: CategoryFormValues) =>
-      isEdit ? categoryService.update(id!, { name: values.name, parent: values.parent || null }) : categoryService.create(values),
+    mutationFn: (values: CategoryFormValues) => {
+      const payload = {
+        name: cleanI18nText(values.name) ?? {},
+        description: cleanI18nText(values.description),
+        parent: values.parent || null,
+      };
+      return isEdit ? categoryService.update(id!, payload) : categoryService.create(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.CATEGORIES]);
       queryClient.invalidateQueries([queryKeys.CATEGORIES_TREE]);
@@ -80,7 +93,14 @@ export const CategoryFormPage = () => {
         {serverError && <Alert type="error" message={serverError} showIcon className="mb-4" />}
 
         <form onSubmit={handleSubmit((v) => mutation.mutate(v))}>
-          <I18nFieldGroup control={control} namePrefix="name" label={t("categories.name") as string} />
+          <I18nFieldGroup control={control} namePrefix="name" label={t("categories.name") as string} minRequired={1} />
+          <I18nFieldGroup
+            control={control}
+            namePrefix="description"
+            label={t("categories.description") as string}
+            multiline
+            minRequired={0}
+          />
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">{t("categories.parent")}</label>

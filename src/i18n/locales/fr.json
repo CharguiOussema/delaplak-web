@@ -34,6 +34,7 @@
 
   "validation.required": "Ce champ est requis",
   "validation.minLength": "Doit contenir au moins {{count}} caractères",
+  "validation.atLeastOneLanguage": "Au moins une langue doit être renseignée",
 
   "common.actions": "Actions",
   "common.back": "Retour",
@@ -86,6 +87,10 @@
   "orders.confirmConfirm": "Confirmer cette commande ? Une facture sera générée.",
   "orders.confirmSuccess": "Commande confirmée et facture générée",
   "orders.notFound": "Commande introuvable",
+  "orders.cancel": "Annuler la commande",
+  "orders.cancelConfirm": "Annuler cette commande ? Cette action est irréversible.",
+  "orders.cancelSuccess": "Commande annulée",
+  "orders.cancelledAt": "Annulée le",
 
   "invoices.number": "Numéro de facture",
   "invoices.issuedAt": "Émise le",
@@ -132,6 +137,12 @@
   "categories.updateSuccess": "Catégorie mise à jour",
   "categories.deleteConfirm": "Supprimer cette catégorie ?",
   "categories.deleteSuccess": "Catégorie supprimée",
+  "categories.description": "Description",
+  "categories.quickAddTitle": "Ajouter une catégorie",
+  "categories.quickAddButton": "Ajouter une catégorie",
+  "categories.quickAddSubmit": "Créer",
+  "categories.quickAddSuccess": "Catégorie créée",
+  "categories.deleted": "supprimée",
 
   "products.name": "Nom",
   "products.description": "Description",

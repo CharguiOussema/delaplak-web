@@ -4,7 +4,8 @@ import type { PaginationResponse, FilterOption } from "../models/ResponseType";
 import type { Category, CategoryTreeNode, I18nText } from "../models/entities";
 
 export interface CategoryPayload {
-  name: I18nText;
+  name: Partial<I18nText>;
+  description?: Partial<I18nText>;
   parent?: string | null;
 }
 

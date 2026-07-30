@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
-import { Table, type TableProps } from "antd";
+import { Table, Button, type TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { invoiceService } from "../../services/InvoiceService";
 import { queryKeys } from "../../services/QueryClientManager";
@@ -22,8 +22,16 @@ export const InvoicesListPage = () => {
 
   const columns: TableProps<Invoice>["columns"] = [
     { title: t("invoices.number"), dataIndex: "number", render: (n: string, r) => <Link to={`/invoices/${r._id}`}>{n}</Link> },
-    { title: t("invoices.total"), dataIndex: "total", render: (v: number) => formatPrice(v, "MAD") },
+    { title: t("invoices.total"), dataIndex: "total", render: (v: number, r: Invoice) => formatPrice(v, r.currency) },
     { title: t("invoices.issuedAt"), dataIndex: "issuedAt", render: (d: string) => new Date(d).toLocaleDateString(language) },
+    {
+      title: t("common.actions"),
+      render: (_: unknown, row: Invoice) => (
+        <Link to={`/invoices/${row._id}`}>
+          <Button size="small">{t("common.view")}</Button>
+        </Link>
+      ),
+    },
   ];
 
   return (

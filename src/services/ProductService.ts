@@ -12,7 +12,7 @@ export interface ProductPayload {
   thickness?: string;
   texture?: string;
   applicationDomains?: string[];
-  category: string;
+  categories: string[];
   stock?: number;
 }
 

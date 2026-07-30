@@ -34,6 +34,7 @@
 
   "validation.required": "هذا الحقل مطلوب",
   "validation.minLength": "يجب ألا يقل عن {{count}} أحرف",
+  "validation.atLeastOneLanguage": "يجب ملء لغة واحدة على الأقل",
 
   "common.actions": "إجراءات",
   "common.back": "رجوع",
@@ -86,6 +87,10 @@
   "orders.confirmConfirm": "هل تريد تأكيد هذا الطلب؟ سيتم إنشاء فاتورة.",
   "orders.confirmSuccess": "تم تأكيد الطلب وإنشاء الفاتورة",
   "orders.notFound": "الطلب غير موجود",
+  "orders.cancel": "إلغاء الطلب",
+  "orders.cancelConfirm": "هل تريد إلغاء هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+  "orders.cancelSuccess": "تم إلغاء الطلب",
+  "orders.cancelledAt": "تاريخ الإلغاء",
 
   "invoices.number": "رقم الفاتورة",
   "invoices.issuedAt": "تاريخ الإصدار",
@@ -132,6 +137,12 @@
   "categories.updateSuccess": "تم تحديث الفئة",
   "categories.deleteConfirm": "هل تريد حذف هذه الفئة؟",
   "categories.deleteSuccess": "تم حذف الفئة",
+  "categories.description": "الوصف",
+  "categories.quickAddTitle": "إضافة فئة",
+  "categories.quickAddButton": "إضافة فئة",
+  "categories.quickAddSubmit": "إنشاء",
+  "categories.quickAddSuccess": "تم إنشاء الفئة",
+  "categories.deleted": "محذوفة",
 
   "products.name": "الاسم",
   "products.description": "الوصف",

@@ -71,18 +71,18 @@ export const InvoiceDetailPage = () => {
           columns={[
             { title: t("invoices.description"), dataIndex: "description" },
             { title: t("invoices.quantity"), dataIndex: "quantity" },
-            { title: t("invoices.unitPrice"), dataIndex: "unitPrice", render: (v: number) => formatPrice(v, "MAD") },
-            { title: t("invoices.lineTotal"), dataIndex: "lineTotal", render: (v: number) => formatPrice(v, "MAD") },
+            { title: t("invoices.unitPrice"), dataIndex: "unitPrice", render: (v: number) => formatPrice(v, invoice.currency) },
+            { title: t("invoices.lineTotal"), dataIndex: "lineTotal", render: (v: number) => formatPrice(v, invoice.currency) },
           ]}
         />
         <div className="flex justify-end gap-8 pt-4 mt-2 border-t border-border text-sm">
           <div className="text-end">
             <div className="text-muted-foreground">{t("invoices.subtotal")}</div>
-            <div className="font-semibold text-base">{formatPrice(invoice.subtotal, "MAD")}</div>
+            <div className="font-semibold text-base">{formatPrice(invoice.subtotal, invoice.currency)}</div>
           </div>
           <div className="text-end">
             <div className="text-muted-foreground">{t("invoices.total")}</div>
-            <div className="font-semibold text-base text-primary">{formatPrice(invoice.total, "MAD")}</div>
+            <div className="font-semibold text-base text-primary">{formatPrice(invoice.total, invoice.currency)}</div>
           </div>
         </div>
       </Card>
