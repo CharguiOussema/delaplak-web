@@ -184,7 +184,6 @@ export const CatalogPage = () => {
                         description={
                           <div className="space-y-1">
                             <div className="font-semibold text-primary text-base">{formatPrice(product.price, product.currency)}</div>
-                            {product.texture && <div className="text-xs text-muted-foreground">{product.texture}</div>}
                           </div>
                         }
                       />

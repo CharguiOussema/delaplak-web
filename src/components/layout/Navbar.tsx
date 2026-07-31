@@ -73,6 +73,7 @@ export const Navbar = () => {
               { key: "/users", label: <Link to="/users">{t("navigation.users")}</Link> },
               { key: "/categories", label: <Link to="/categories">{t("navigation.categories")}</Link> },
               { key: "/products", label: <Link to="/products">{t("navigation.products")}</Link> },
+              { key: "/product-attributes", label: <Link to="/product-attributes">{t("navigation.productAttributes")}</Link> },
               { key: "/invoices", label: <Link to="/invoices">{t("navigation.invoices")}</Link> },
             ],
           }}

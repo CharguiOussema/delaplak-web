@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { Spin, Result, Button, InputNumber, Tag, App as AntdApp, Breadcrumb } from "antd";
+import { Spin, Result, Button, InputNumber, Tag, Radio, App as AntdApp, Breadcrumb } from "antd";
 import { ShoppingCartOutlined, LeftOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { productService } from "../../services/ProductService";
@@ -12,7 +12,26 @@ import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
 import { USER_ROLES } from "../../models/consts";
-import type { Category, Cart } from "../../models/entities";
+import type { Category, Cart, Product, ProductAttribute } from "../../models/entities";
+
+interface AttributeGroup {
+  attribute: ProductAttribute;
+  options: { option: string; priceAdjustment: number }[];
+}
+
+// Product.attributeOptions is a flat list of (attribute, option, priceAdjustment) rows —
+// group it back by attribute type so the client picks one option per setting, the way the
+// admin configured it (Texture / Thickness / Dimensions, each with its own price deltas).
+function groupByAttribute(product: Product): AttributeGroup[] {
+  const groups = new Map<string, AttributeGroup>();
+  for (const selection of product.attributeOptions) {
+    if (typeof selection.attribute !== "object") continue;
+    const attribute = selection.attribute;
+    if (!groups.has(attribute._id)) groups.set(attribute._id, { attribute, options: [] });
+    groups.get(attribute._id)!.options.push({ option: selection.option, priceAdjustment: selection.priceAdjustment });
+  }
+  return [...groups.values()];
+}
 
 export const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +43,7 @@ export const ProductDetailPage = () => {
   const { message } = AntdApp.useApp();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selections, setSelections] = useState<Record<string, string>>({});
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: [queryKeys.PRODUCTS, id],
@@ -31,8 +51,41 @@ export const ProductDetailPage = () => {
     enabled: !!id,
   });
 
+  const attributeGroups = useMemo(() => (product ? groupByAttribute(product) : []), [product]);
+
+  // Defaults to the first configured option per setting, mirroring how the admin lists
+  // them — the client can still change it before adding to cart.
+  useEffect(() => {
+    if (attributeGroups.length === 0) return;
+    setSelections((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const group of attributeGroups) {
+        if (!next[group.attribute._id]) {
+          next[group.attribute._id] = group.options[0].option;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [attributeGroups]);
+
+  const unitPrice = useMemo(() => {
+    if (!product) return 0;
+    return attributeGroups.reduce((sum, group) => {
+      const selectedOption = selections[group.attribute._id];
+      const match = group.options.find((o) => o.option === selectedOption);
+      return sum + (match?.priceAdjustment ?? 0);
+    }, product.price);
+  }, [product, attributeGroups, selections]);
+
   const addToCart = useMutation<Cart, unknown, void>({
-    mutationFn: () => cartService.addItem(id!, quantity),
+    mutationFn: () =>
+      cartService.addItem(
+        id!,
+        quantity,
+        attributeGroups.map((group) => ({ attribute: group.attribute._id, option: selections[group.attribute._id] })),
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.CART]);
       message.success(t("product.addedToCart"));
@@ -54,6 +107,7 @@ export const ProductDetailPage = () => {
 
   const category = product.categories.find((c): c is Category => typeof c === "object") ?? null;
   const isClient = user?.role === USER_ROLES.CLIENT;
+  const allSelected = attributeGroups.every((group) => !!selections[group.attribute._id]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
@@ -102,12 +156,9 @@ export const ProductDetailPage = () => {
 
         <div>
           <h1 className="text-3xl font-bold mb-2">{localize(product.name, language)}</h1>
-          <div className="text-2xl font-semibold text-primary mb-4">{formatPrice(product.price, product.currency)}</div>
+          <div className="text-2xl font-semibold text-primary mb-4">{formatPrice(unitPrice, product.currency)}</div>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            {product.texture && <Tag color="green">{product.texture}</Tag>}
-            {product.dimensions && <Tag>{product.dimensions}</Tag>}
-            {product.thickness && <Tag>{product.thickness}</Tag>}
             {product.applicationDomains.map((d) => (
               <Tag color="blue" key={d}>
                 {d}
@@ -116,6 +167,33 @@ export const ProductDetailPage = () => {
           </div>
 
           <p className="text-foreground/80 leading-relaxed mb-6 whitespace-pre-line">{localize(product.description, language)}</p>
+
+          {attributeGroups.length > 0 && (
+            <div className="space-y-4 mb-6">
+              {attributeGroups.map((group) => (
+                <div key={group.attribute._id}>
+                  <div className="text-sm font-medium mb-1.5">{localize(group.attribute.name, language)}</div>
+                  <Radio.Group
+                    value={selections[group.attribute._id]}
+                    onChange={(e) => setSelections((prev) => ({ ...prev, [group.attribute._id]: e.target.value }))}
+                  >
+                    {group.options.map(({ option, priceAdjustment }) => {
+                      const optionInfo = group.attribute.options.find((o) => o._id === option);
+                      const label = optionInfo ? localize(optionInfo.name, language) : option;
+                      const suffix =
+                        priceAdjustment > 0 ? ` (+${formatPrice(priceAdjustment, product.currency)})` : priceAdjustment < 0 ? ` (${formatPrice(priceAdjustment, product.currency)})` : "";
+                      return (
+                        <Radio.Button key={option} value={option}>
+                          {label}
+                          {suffix}
+                        </Radio.Button>
+                      );
+                    })}
+                  </Radio.Group>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="text-sm text-muted-foreground mb-6">
             {t("product.stock")}: <span className="font-medium text-foreground">{product.stock}</span>
@@ -129,7 +207,7 @@ export const ProductDetailPage = () => {
                 size="large"
                 icon={<ShoppingCartOutlined />}
                 loading={addToCart.isLoading}
-                disabled={product.stock <= 0}
+                disabled={product.stock <= 0 || !allSelected}
                 onClick={() => addToCart.mutate()}
               >
                 {product.stock > 0 ? t("product.addToCart") : t("product.outOfStock")}

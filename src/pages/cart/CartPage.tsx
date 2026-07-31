@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Button, Empty, InputNumber, Spin, App as AntdApp, Popconfirm } from "antd";
+import { Button, Empty, InputNumber, Spin, App as AntdApp, Popconfirm, Tag } from "antd";
 import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { cartService } from "../../services/CartService";
@@ -9,7 +9,21 @@ import { useApp } from "../../hooks";
 import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
-import type { Cart } from "../../models/entities";
+import type { Cart, CartItem, ProductAttribute } from "../../models/entities";
+import type { Language } from "../../contexts/AppContext";
+
+// Selected options only carry (attribute, option) ids — their display names live on the
+// populated product.attributeOptions[].attribute (a ProductAttribute doc with its options).
+function describeSelectedOptions(item: CartItem, language: Language): string[] {
+  return item.selectedOptions.map((selection) => {
+    const configured = item.product.attributeOptions.find(
+      (entry) => (typeof entry.attribute === "object" ? entry.attribute._id : entry.attribute) === selection.attribute,
+    );
+    const attribute = typeof configured?.attribute === "object" ? (configured.attribute as ProductAttribute) : undefined;
+    const option = attribute?.options.find((o) => o._id === selection.option);
+    return option ? localize(option.name, language) : selection.option;
+  });
+}
 
 export const CartPage = () => {
   const { t } = useTranslation();
@@ -25,14 +39,14 @@ export const CartPage = () => {
 
   const invalidate = () => queryClient.invalidateQueries([queryKeys.CART]);
 
-  const updateQty = useMutation<Cart, unknown, { productId: string; quantity: number }>({
-    mutationFn: ({ productId, quantity }) => cartService.setItemQuantity(productId, quantity),
+  const updateQty = useMutation<Cart, unknown, { itemId: string; quantity: number }>({
+    mutationFn: ({ itemId, quantity }) => cartService.setItemQuantity(itemId, quantity),
     onSuccess: invalidate,
     onError: (err) => { message.error(getErrorMessage(err)); },
   });
 
   const removeItem = useMutation<Cart, unknown, string>({
-    mutationFn: (productId: string) => cartService.removeItem(productId),
+    mutationFn: (itemId: string) => cartService.removeItem(itemId),
     onSuccess: invalidate,
     onError: (err) => { message.error(getErrorMessage(err)); },
   });
@@ -52,7 +66,7 @@ export const CartPage = () => {
   }
 
   const items = cart?.items ?? [];
-  const total = items.reduce((sum, it) => sum + it.product.price * it.quantity, 0);
+  const total = items.reduce((sum, it) => sum + it.unitPrice * it.quantity, 0);
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
@@ -68,7 +82,7 @@ export const CartPage = () => {
         <>
           <div className="divide-y divide-border border border-border rounded-lg overflow-hidden bg-card">
             {items.map((item) => (
-              <div key={item.product._id} className="flex items-center gap-4 p-4">
+              <div key={item._id} className="flex items-center gap-4 p-4">
                 <Link to={`/products/${item.product._id}`} className="w-20 h-20 shrink-0 bg-muted rounded-md overflow-hidden">
                   {item.product.images[0] && (
                     <img src={imageUrl(API_URL, item.product.images[0])} alt="" className="w-full h-full object-cover" />
@@ -78,20 +92,27 @@ export const CartPage = () => {
                   <Link to={`/products/${item.product._id}`} className="font-medium hover:text-primary line-clamp-1">
                     {localize(item.product.name, language)}
                   </Link>
-                  <div className="text-sm text-muted-foreground">{formatPrice(item.product.price, item.product.currency)}</div>
+                  <div className="text-sm text-muted-foreground">{formatPrice(item.unitPrice, item.product.currency)}</div>
+                  {item.selectedOptions.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {describeSelectedOptions(item, language).map((label, i) => (
+                        <Tag key={i}>{label}</Tag>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <InputNumber
                   min={1}
                   max={item.product.stock}
                   value={item.quantity}
-                  onChange={(v) => v && updateQty.mutate({ productId: item.product._id, quantity: v })}
+                  onChange={(v) => v && updateQty.mutate({ itemId: item._id, quantity: v })}
                 />
-                <div className="w-24 text-end font-semibold">{formatPrice(item.product.price * item.quantity, item.product.currency)}</div>
+                <div className="w-24 text-end font-semibold">{formatPrice(item.unitPrice * item.quantity, item.product.currency)}</div>
                 <Button
                   type="text"
                   danger
                   icon={<DeleteOutlined />}
-                  onClick={() => removeItem.mutate(item.product._id)}
+                  onClick={() => removeItem.mutate(item._id)}
                   loading={removeItem.isLoading}
                 />
               </div>

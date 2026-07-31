@@ -43,7 +43,7 @@ export const CheckoutPage = () => {
   }
 
   const items = cart?.items ?? [];
-  const total = items.reduce((sum, it) => sum + it.product.price * it.quantity, 0);
+  const total = items.reduce((sum, it) => sum + it.unitPrice * it.quantity, 0);
 
   if (items.length === 0) {
     return (
@@ -64,7 +64,7 @@ export const CheckoutPage = () => {
       <Card title={t("checkout.reviewOrder")} className="mb-6">
         <div className="divide-y divide-border">
           {items.map((item) => (
-            <div key={item.product._id} className="flex items-center gap-4 py-3">
+            <div key={item._id} className="flex items-center gap-4 py-3">
               <div className="w-14 h-14 shrink-0 bg-muted rounded-md overflow-hidden">
                 {item.product.images[0] && (
                   <img src={imageUrl(API_URL, item.product.images[0])} alt="" className="w-full h-full object-cover" />
@@ -73,10 +73,10 @@ export const CheckoutPage = () => {
               <div className="flex-1">
                 <div className="font-medium">{localize(item.product.name, language)}</div>
                 <div className="text-sm text-muted-foreground">
-                  {item.quantity} × {formatPrice(item.product.price, item.product.currency)}
+                  {item.quantity} × {formatPrice(item.unitPrice, item.product.currency)}
                 </div>
               </div>
-              <div className="font-semibold">{formatPrice(item.product.price * item.quantity, item.product.currency)}</div>
+              <div className="font-semibold">{formatPrice(item.unitPrice * item.quantity, item.product.currency)}</div>
             </div>
           ))}
         </div>

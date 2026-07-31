@@ -9,6 +9,8 @@ export const queryKeys = {
   CATEGORIES_FILTER: "categoriesFilter",
   PRODUCTS: "products",
   PRODUCTS_FILTER: "productsFilter",
+  PRODUCT_ATTRIBUTES: "productAttributes",
+  PRODUCT_ATTRIBUTES_FILTER: "productAttributesFilter",
   CART: "cart",
   ORDERS: "orders",
   INVOICES: "invoices",

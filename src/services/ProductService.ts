@@ -3,14 +3,18 @@ import { QueryBuilder } from "./QueryBuilder";
 import type { PaginationResponse, FilterOption } from "../models/ResponseType";
 import type { Product, I18nText } from "../models/entities";
 
+export interface ProductAttributeSelectionPayload {
+  attribute: string;
+  option: string;
+  priceAdjustment: number;
+}
+
 export interface ProductPayload {
   name: I18nText;
   description: I18nText;
   price: number;
   currency?: string;
-  dimensions?: string;
-  thickness?: string;
-  texture?: string;
+  attributeOptions?: ProductAttributeSelectionPayload[];
   applicationDomains?: string[];
   categories: string[];
   stock?: number;

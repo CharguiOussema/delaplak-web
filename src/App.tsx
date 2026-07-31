@@ -30,6 +30,7 @@ import { CategoriesListPage } from "./pages/admin/categories/CategoriesListPage"
 import { CategoryFormPage } from "./pages/admin/categories/CategoryFormPage";
 import { ProductsListPage } from "./pages/admin/products/ProductsListPage";
 import { ProductFormPage } from "./pages/admin/products/ProductFormPage";
+import { ProductAttributesPage } from "./pages/admin/productAttributes/ProductAttributesPage";
 import { NotFoundPage } from "./pages/errors/NotFoundPage";
 
 const queryClient = queryClientManager.getQueryClient();
@@ -202,6 +203,16 @@ const AppContent = () => {
               element={
                 <ProtectedModuleRoute module="products" writeOnly>
                   <ProductFormPage />
+                </ProtectedModuleRoute>
+              }
+            />
+
+            {/* product settings: attribute types (Texture/Thickness/Dimensions...) + options */}
+            <Route
+              path="/product-attributes"
+              element={
+                <ProtectedModuleRoute module="productAttributes">
+                  <ProductAttributesPage />
                 </ProtectedModuleRoute>
               }
             />

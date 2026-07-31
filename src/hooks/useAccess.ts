@@ -3,9 +3,9 @@ import { USER_ROLES } from '../models/consts';
 
 // Extended per deviation: every admin-facing module registered here.
 // There is now a single staff role (ADMIN) — no tiered SUPER_ADMIN distinction.
-export type AccessModule = 'users' | 'categories' | 'products' | 'cart' | 'orders' | 'invoices';
+export type AccessModule = 'users' | 'categories' | 'products' | 'productAttributes' | 'cart' | 'orders' | 'invoices';
 
-const ADMIN_ONLY_WRITE_MODULES: AccessModule[] = ['users', 'categories', 'products', 'orders'];
+const ADMIN_ONLY_WRITE_MODULES: AccessModule[] = ['users', 'categories', 'products', 'productAttributes', 'orders'];
 
 export const useAccess = () => {
   const { user } = useAuth();
