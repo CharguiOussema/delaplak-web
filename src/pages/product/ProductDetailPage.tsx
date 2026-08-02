@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { Spin, Result, Button, InputNumber, Tag, Radio, App as AntdApp, Breadcrumb } from "antd";
-import { ShoppingCartOutlined, LeftOutlined } from "@ant-design/icons";
+import { ShoppingCartOutlined, LeftOutlined, PictureOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { productService } from "../../services/ProductService";
 import { cartService } from "../../services/CartService";
 import { queryKeys } from "../../services/QueryClientManager";
 import { useApp, useAuth } from "../../hooks";
+import { RoomPreviewModal } from "../../components/product-preview/RoomPreviewModal";
 import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
@@ -44,6 +45,7 @@ export const ProductDetailPage = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: [queryKeys.PRODUCTS, id],
@@ -152,6 +154,16 @@ export const ProductDetailPage = () => {
               ))}
             </div>
           )}
+          {isClient && product.images.length > 0 && (
+            <Button
+              block
+              icon={<PictureOutlined />}
+              className="mt-3"
+              onClick={() => setPreviewOpen(true)}
+            >
+              {t("product.preview.cta")}
+            </Button>
+          )}
         </div>
 
         <div>
@@ -216,6 +228,13 @@ export const ProductDetailPage = () => {
           )}
         </div>
       </div>
+
+      <RoomPreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        productImageUrl={imageUrl(API_URL, product.images[activeImage])}
+        productName={localize(product.name, language)}
+      />
     </div>
   );
 };

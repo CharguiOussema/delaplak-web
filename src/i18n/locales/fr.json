@@ -57,6 +57,13 @@
   "product.outOfStock": "Rupture de stock",
   "product.stock": "Stock",
   "product.notFound": "Produit introuvable",
+  "product.preview.cta": "Aperçu dans votre espace",
+  "product.preview.title": "Aperçu dans votre espace",
+  "product.preview.hint": "Importez une photo de votre espace pour voir à quoi ressemblerait ce produit. La photo reste sur votre appareil et n'est jamais envoyée.",
+  "product.preview.choosePhoto": "Choisir une photo",
+  "product.preview.changePhoto": "Changer de photo",
+  "product.preview.resetPosition": "Réinitialiser la position",
+  "product.preview.disclaimer": "Ceci est uniquement un aperçu visuel. Votre photo n'est ni enregistrée ni envoyée.",
 
   "cart.title": "Mon panier",
   "cart.empty": "Votre panier est vide.",

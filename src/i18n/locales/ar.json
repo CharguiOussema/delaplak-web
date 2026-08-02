@@ -57,6 +57,13 @@
   "product.outOfStock": "غير متوفر",
   "product.stock": "المخزون",
   "product.notFound": "المنتج غير موجود",
+  "product.preview.cta": "معاينة في مساحتك",
+  "product.preview.title": "معاينة في مساحتك",
+  "product.preview.hint": "حمّل صورة لمساحتك لمشاهدة شكل هذا المنتج فيها. تبقى الصورة على جهازك ولا يتم رفعها أبدًا.",
+  "product.preview.choosePhoto": "اختر صورة",
+  "product.preview.changePhoto": "تغيير الصورة",
+  "product.preview.resetPosition": "إعادة ضبط الموضع",
+  "product.preview.disclaimer": "هذه معاينة مرئية فقط. لا يتم حفظ صورتك أو إرسالها.",
 
   "cart.title": "سلتي",
   "cart.empty": "سلتك فارغة.",
