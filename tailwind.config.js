@@ -25,6 +25,12 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "9999px",
+      },
+      boxShadow: {
+        "soft-primary": "0 8px 20px hsl(var(--primary) / 0.35)",
+        card: "0 10px 30px rgba(15, 23, 42, 0.08)",
+        "card-hover": "0 16px 40px rgba(15, 23, 42, 0.14)",
       },
     },
   },

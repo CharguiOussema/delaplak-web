@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 /* Theme Variables — DeLAPLAK custom design system (deviation 6: original palette, not delaplak.com's).
-   Single white/light design — no dark mode. */
+   Single white/light design — no dark mode.
+   Mirrors src/theme/tokens.ts (source of truth) — keep both in sync. */
 :root {
   color-scheme: light;
   --background: 0 0% 100%;
@@ -12,20 +13,20 @@
   --card-foreground: 222 20% 12%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 20% 12%;
-  --primary: 170 62% 24%;
+  --primary: 330 81% 60%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 32 45% 55%;
-  --secondary-foreground: 24 30% 12%;
+  --secondary: 258 90% 66%;
+  --secondary-foreground: 0 0% 100%;
   --muted: 210 20% 96%;
   --muted-foreground: 215 16% 40%;
-  --accent: 32 45% 92%;
-  --accent-foreground: 170 62% 18%;
-  --destructive: 0 72% 51%;
+  --accent: 326 78% 95%;
+  --accent-foreground: 336 74% 35%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --border: 214 20% 89%;
   --input: 214 20% 89%;
-  --ring: 170 62% 24%;
-  --radius: 0.625rem;
+  --ring: 330 81% 60%;
+  --radius: 1.25rem;
 }
 
 @layer base {
@@ -49,6 +50,10 @@
   a {
     color: inherit;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
 }
 
 /* RTL Support */
@@ -59,12 +64,47 @@
   direction: ltr;
 }
 
-/* Utility: product grid card hover */
+/* Utility: product grid card hover — rounded + soft elevation, lifts on hover */
 .product-card {
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .product-card:hover {
-  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  transform: translateY(-4px);
+}
+
+/* Utility: pill-shaped button with a soft tinted shadow (Now-UI style CTA) */
+.btn-pill {
+  border-radius: 999px !important;
+}
+.shadow-soft-primary {
+  box-shadow: 0 8px 20px hsl(var(--primary) / 0.35);
+}
+
+/* Utility: generic elevated card with hover lift, for non-antd surfaces */
+.card-elevated {
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-elevated:hover {
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  transform: translateY(-4px);
+}
+
+/* Utility: circular soft-tinted icon badge (Now-UI style feature icon) */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background-color: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
 }
 
 /* Focus-visible accessible ring, used alongside Antd's own focus styles */

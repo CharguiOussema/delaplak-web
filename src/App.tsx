@@ -12,6 +12,7 @@ import { ProtectedModuleRoute } from "./components/ProtectedModuleRoute";
 import { MainLayout } from "./components/layout/MainLayout";
 import { useApp } from "./hooks";
 import { queryClientManager } from "./services/QueryClientManager";
+import { palette, radius, shadow } from "./theme/tokens";
 
 import { LoginPage } from "./pages/auth/LoginPage";
 import { SignupPage } from "./pages/auth/SignupPage";
@@ -37,9 +38,10 @@ const queryClient = queryClientManager.getQueryClient();
 
 const ANTD_LOCALES = { en: enUS, fr: frFR, ar: arEG };
 
-// Deviation 6: original DeLAPLAK design system — a deep teal primary / warm sand
-// secondary, layered on the CSS-variable tokens in index.css. Not a copy of
-// delaplak.com's palette.
+// Deviation 6: original DeLAPLAK design system — vivid rose/violet primary,
+// layered on the CSS-variable tokens in index.css. Not a copy of
+// delaplak.com's palette. Values come from ./theme/tokens.ts (single source
+// of truth, also mirrored as CSS vars in index.css for Tailwind utilities).
 const AntdThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { isRTL, language } = useApp();
 
@@ -49,21 +51,42 @@ const AntdThemeProvider = ({ children }: { children: React.ReactNode }) => {
       locale={ANTD_LOCALES[language]}
       theme={{
         token: {
-          colorPrimary: "#146356",
-          colorInfo: "#146356",
-          colorSuccess: "#1a8f5e",
-          colorWarning: "#c08b3e",
-          colorError: "#c0392b",
-          colorLink: "#146356",
-          borderRadius: 10,
+          colorPrimary: palette.primary[500],
+          colorInfo: palette.info[500],
+          colorSuccess: palette.success[500],
+          colorWarning: palette.warning[500],
+          colorError: palette.danger[500],
+          colorLink: palette.primary[500],
+          borderRadius: radius.md,
+          controlHeight: 38,
           fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
           fontSize: 14,
-          colorBgLayout: "#f7f8f7",
+          colorBgLayout: palette.slate[50],
         },
         components: {
-          Button: { fontWeight: 500, controlHeight: 38 },
-          Card: { borderRadiusLG: 14 },
-          Menu: { itemSelectedBg: "#e4efec" },
+          Button: {
+            fontWeight: 500,
+            borderRadius: radius.pill,
+            primaryShadow: shadow.softPrimary,
+          },
+          Card: {
+            borderRadiusLG: radius.lg,
+            boxShadowTertiary: shadow.card,
+          },
+          Menu: { itemSelectedBg: palette.primary[100] },
+          Input: { activeShadow: `0 0 0 3px ${palette.primary[500]}26` },
+          Select: { optionSelectedBg: palette.primary[100] },
+          Tag: { borderRadiusSM: radius.pill },
+          Table: {
+            headerBg: palette.slate[50],
+            headerColor: palette.slate[900],
+            cellPaddingBlock: 14,
+            rowHoverBg: palette.primary[100],
+            borderRadius: radius.lg,
+          },
+          Modal: { titleFontSize: 18, borderRadiusLG: radius.lg },
+          Alert: { borderRadiusLG: radius.md },
+          Typography: { titleMarginBottom: "0.4em", fontWeightStrong: 700 },
         },
       }}
     >

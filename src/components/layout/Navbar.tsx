@@ -60,10 +60,16 @@ export const Navbar = () => {
 
   const navLinks = (
     <>
-      <Link to="/" className="hover:text-primary transition-colors font-medium">
+      <Link
+        to="/"
+        className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+      >
         {t("navigation.catalog")}
       </Link>
-      <Link to="/orders" className="hover:text-primary transition-colors font-medium">
+      <Link
+        to="/orders"
+        className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+      >
         {t("navigation.orders")}
       </Link>
       {isStaff && (
@@ -78,7 +84,7 @@ export const Navbar = () => {
             ],
           }}
         >
-          <span className="hover:text-primary transition-colors font-medium cursor-pointer flex items-center gap-1">
+          <span className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center gap-1">
             {t("navigation.admin")} <SettingOutlined className="text-xs" />
           </span>
         </Dropdown>
@@ -87,17 +93,17 @@ export const Navbar = () => {
   );
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-card/95 backdrop-blur">
+    <header className="sticky top-0 z-40 w-full bg-card/95 backdrop-blur shadow-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-xl font-bold tracking-tight text-primary">DeLAPLAK</span>
+          <span className="text-xl font-extrabold tracking-tight text-primary">DeLAPLAK</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm">{navLinks}</nav>
+        <nav className="hidden md:flex items-center gap-2 text-sm">{navLinks}</nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Dropdown menu={langMenu} trigger={["click"]}>
-            <Button type="text" icon={<GlobalOutlined />} className="hidden sm:inline-flex">
+            <Button type="text" icon={<GlobalOutlined />} className="btn-pill hidden sm:inline-flex">
               {LANGUAGE_LABELS[language]}
             </Button>
           </Dropdown>
@@ -112,11 +118,11 @@ export const Navbar = () => {
 
           {user ? (
             <Dropdown menu={userMenu} trigger={["click"]}>
-              <Avatar icon={<UserOutlined />} className="cursor-pointer bg-primary" />
+              <Avatar icon={<UserOutlined />} className="cursor-pointer bg-primary shadow-soft-primary" />
             </Dropdown>
           ) : (
             <Link to="/login">
-              <Button type="primary" icon={<LockOutlined />}>
+              <Button type="primary" icon={<LockOutlined />} className="btn-pill shadow-soft-primary">
                 {t("auth.login.title")}
               </Button>
             </Link>
@@ -124,6 +130,7 @@ export const Navbar = () => {
 
           <Button
             type="text"
+            shape="circle"
             className="md:hidden"
             icon={<MenuOutlined />}
             onClick={() => setMobileOpen(true)}

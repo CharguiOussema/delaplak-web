@@ -8,8 +8,8 @@ export const MainLayout = () => {
       <main className="flex-1 w-full">
         <Outlet />
       </main>
-      <footer className="border-t border-border py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} DeLAPLAK — PVC Decorative Wall Panels
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        © {new Date().getFullYear()} <span className="font-semibold text-foreground">DeLAPLAK</span> — PVC Decorative Wall Panels
       </footer>
     </div>
   );
