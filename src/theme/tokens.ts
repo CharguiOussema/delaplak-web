@@ -4,28 +4,31 @@
 // keep both in sync when changing a token here.
 
 export const palette = {
-  primary: { 500: "#EC4899", 600: "#DB2777", 100: "#FCE7F3", 700: "#9D174D" },
-  accent: { 500: "#8B5CF6", 600: "#7C3AED" },
+  // brass = primary accent (wood tone, echoes the logo's wood-diamond half)
+  primary: { 500: "#B8863E", 600: "#96692C", 100: "#F1E4CC", 700: "#7A5423" },
+  // azure = secondary accent (echoes the logo's blue-diamond half)
+  accent: { 500: "#3E7CA6", 600: "#2A5A78" },
   info: { 500: "#0EA5E9", 100: "#E0F2FE" },
   success: { 500: "#22C55E", 100: "#DCFCE7" },
   warning: { 500: "#F59E0B", 100: "#FEF3C7" },
   danger: { 500: "#EF4444", 100: "#FEE2E2" },
+  // warm neutrals, matching the "Atelier"-inspired reference template
   slate: {
-    50: "#F8FAFC",
-    100: "#F1F5F9",
-    200: "#E2E8F0",
-    300: "#CBD5E1",
-    400: "#94A3B8",
-    500: "#64748B",
-    600: "#475569",
-    900: "#0F172A",
+    50: "#F6F1EA",  // ivory
+    100: "#EDE6DA", // cream
+    200: "#DBCFBE", // sand
+    300: "#C7B9A4",
+    400: "#7A7267", // stone
+    500: "#3A362F", // charcoal
+    600: "#2A2721",
+    900: "#1C1A17", // ink
   },
 } as const;
 
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 20,
+  sm: 2,
+  md: 4,
+  lg: 8,
   pill: 999,
 } as const;
 

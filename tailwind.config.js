@@ -20,7 +20,25 @@ export default {
         accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+        // Literal template-style palette (Atelier-inspired), for classes like
+        // bg-cream / text-brass where reading the raw name is clearer than
+        // the semantic bg-primary/bg-muted aliases above.
+        ivory: "#F6F1EA",
+        cream: "#EDE6DA",
+        sand: "#DBCFBE",
+        ink: "#1C1A17",
+        charcoal: "#3A362F",
+        stone: "#7A7267",
+        brass: "#B8863E",
+        wood: "#DBB164",
+        olive: "#6B6A4B",
+        azure: { DEFAULT: "#3E7CA6", light: "#AFD0E4", dark: "#2A5A78" },
       },
+      fontFamily: {
+        serif: ['"Cormorant Garamond"', "Georgia", "serif"],
+        sans: ['"Inter"', "Helvetica Neue", "Arial", "sans-serif"],
+      },
+      letterSpacing: { widest2: "0.28em" },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

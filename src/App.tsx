@@ -14,6 +14,7 @@ import { useApp } from "./hooks";
 import { queryClientManager } from "./services/QueryClientManager";
 import { palette, radius, shadow } from "./theme/tokens";
 
+import { HomePage } from "./pages/home/HomePage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { SignupPage } from "./pages/auth/SignupPage";
 import { CatalogPage } from "./pages/catalog/CatalogPage";
@@ -38,10 +39,10 @@ const queryClient = queryClientManager.getQueryClient();
 
 const ANTD_LOCALES = { en: enUS, fr: frFR, ar: arEG };
 
-// Deviation 6: original DeLAPLAK design system — vivid rose/violet primary,
-// layered on the CSS-variable tokens in index.css. Not a copy of
-// delaplak.com's palette. Values come from ./theme/tokens.ts (single source
-// of truth, also mirrored as CSS vars in index.css for Tailwind utilities).
+// DeLAPLAK design system — warm ivory/brass palette inspired by the "Atelier"
+// reference template, extended with the brand logo's blue accent, layered on
+// the CSS-variable tokens in index.css. Values come from ./theme/tokens.ts
+// (single source of truth, also mirrored as CSS vars in index.css).
 const AntdThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { isRTL, language } = useApp();
 
@@ -59,14 +60,14 @@ const AntdThemeProvider = ({ children }: { children: React.ReactNode }) => {
           colorLink: palette.primary[500],
           borderRadius: radius.md,
           controlHeight: 38,
-          fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
+          fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
           fontSize: 14,
           colorBgLayout: palette.slate[50],
         },
         components: {
           Button: {
             fontWeight: 500,
-            borderRadius: radius.pill,
+            borderRadius: radius.md,
             primaryShadow: shadow.softPrimary,
           },
           Card: {
@@ -124,7 +125,8 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<CatalogPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
 
             <Route

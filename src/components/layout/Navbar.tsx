@@ -62,13 +62,19 @@ export const Navbar = () => {
     <>
       <Link
         to="/"
-        className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+        className="rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+      >
+        {t("navigation.home")}
+      </Link>
+      <Link
+        to="/catalog"
+        className="rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
       >
         {t("navigation.catalog")}
       </Link>
       <Link
         to="/orders"
-        className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+        className="rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
       >
         {t("navigation.orders")}
       </Link>
@@ -84,7 +90,7 @@ export const Navbar = () => {
             ],
           }}
         >
-          <span className="rounded-pill px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center gap-1">
+          <span className="rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center gap-1">
             {t("navigation.admin")} <SettingOutlined className="text-xs" />
           </span>
         </Dropdown>
@@ -96,7 +102,10 @@ export const Navbar = () => {
     <header className="sticky top-0 z-40 w-full bg-card/95 backdrop-blur shadow-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-xl font-extrabold tracking-tight text-primary">DeLAPLAK</span>
+          <img src="/logo-mark.png" alt="" className="h-9 w-auto" />
+          <span className="font-serif text-2xl tracking-wide text-ink">
+            De<span className="text-brass">LA</span>PLAK
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-2 text-sm">{navLinks}</nav>

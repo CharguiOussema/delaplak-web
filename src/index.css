@@ -1,32 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Theme Variables — DeLAPLAK custom design system (deviation 6: original palette, not delaplak.com's).
+/* Theme Variables — DeLAPLAK custom design system, inspired by the "Atelier" reference
+   template (warm ivory/brass neutrals) extended with the brand logo's blue accent.
    Single white/light design — no dark mode.
    Mirrors src/theme/tokens.ts (source of truth) — keep both in sync. */
 :root {
   color-scheme: light;
-  --background: 0 0% 100%;
-  --foreground: 222 20% 12%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 20% 12%;
+  --background: 35 40% 94%;        /* ivory */
+  --foreground: 36 10% 10%;        /* ink */
+  --card: 0 0% 100%;               /* white */
+  --card-foreground: 36 10% 10%;   /* ink */
   --popover: 0 0% 100%;
-  --popover-foreground: 222 20% 12%;
-  --primary: 330 81% 60%;
+  --popover-foreground: 36 10% 10%;
+  --primary: 35 50% 48%;           /* brass */
   --primary-foreground: 0 0% 100%;
-  --secondary: 258 90% 66%;
+  --secondary: 204 46% 45%;        /* azure */
   --secondary-foreground: 0 0% 100%;
-  --muted: 210 20% 96%;
-  --muted-foreground: 215 16% 40%;
-  --accent: 326 78% 95%;
-  --accent-foreground: 336 74% 35%;
+  --muted: 38 35% 89%;             /* cream */
+  --muted-foreground: 35 8% 44%;   /* stone */
+  --accent: 203 50% 79%;           /* azure light */
+  --accent-foreground: 203 48% 32%; /* azure dark */
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 20% 89%;
-  --input: 214 20% 89%;
-  --ring: 330 81% 60%;
-  --radius: 1.25rem;
+  --border: 35 29% 80%;            /* sand */
+  --input: 35 29% 80%;             /* sand */
+  --ring: 35 50% 48%;              /* brass */
+  --radius: 0.375rem;
 }
 
 @layer base {
@@ -42,7 +45,7 @@
     @apply bg-background text-foreground;
     margin: 0;
     min-height: 100vh;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   }
   #root {
     min-height: 100vh;
@@ -51,8 +54,25 @@
     color: inherit;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-xs font-medium uppercase text-primary;
+    letter-spacing: 0.28em;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center px-7 py-3 text-sm font-medium tracking-wide transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-ivory hover:bg-brass;
+  }
+  .btn-ghost {
+    @apply btn border border-ink/30 text-ink hover:border-brass hover:text-brass;
   }
 }
 
@@ -76,9 +96,9 @@
   transform: translateY(-4px);
 }
 
-/* Utility: pill-shaped button with a soft tinted shadow (Now-UI style CTA) */
+/* Utility: flat-cornered button with a soft tinted shadow */
 .btn-pill {
-  border-radius: 999px !important;
+  border-radius: var(--radius) !important;
 }
 .shadow-soft-primary {
   box-shadow: 0 8px 20px hsl(var(--primary) / 0.35);

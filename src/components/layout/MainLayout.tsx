@@ -9,6 +9,7 @@ export const MainLayout = () => {
         <Outlet />
       </main>
       <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        <img src="/logo-full.png" alt="DeLAPLAK" className="mx-auto mb-3 h-8 w-auto" />
         © {new Date().getFullYear()} <span className="font-semibold text-foreground">DeLAPLAK</span> — PVC Decorative Wall Panels
       </footer>
     </div>
