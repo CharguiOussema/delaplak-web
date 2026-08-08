@@ -8,8 +8,12 @@ import { useAuth } from "../../hooks";
 import { getErrorMessage } from "../../utils/errorHandling";
 import { LANGUAGES } from "../../models/consts";
 
+const PHONE_PATTERN = /^\+?[0-9][0-9\s-]{6,19}$/;
+
 interface ProfileFormValues {
   email: string;
+  fullName: string;
+  phone: string;
   preferredLanguage: LANGUAGES;
 }
 
@@ -37,12 +41,12 @@ export const ProfilePage = () => {
     reset: resetProfile,
     formState: { errors: profileErrors },
   } = useForm<ProfileFormValues>({
-    defaultValues: { email: "", preferredLanguage: LANGUAGES.en },
+    defaultValues: { email: "", fullName: "", phone: "", preferredLanguage: LANGUAGES.en },
   });
 
   useEffect(() => {
     if (user) {
-      resetProfile({ email: user.email, preferredLanguage: user.preferredLanguage });
+      resetProfile({ email: user.email, fullName: user.fullName, phone: user.phone, preferredLanguage: user.preferredLanguage });
     }
   }, [user, resetProfile]);
 
@@ -86,6 +90,31 @@ export const ProfilePage = () => {
           {profileError && <Alert type="error" message={profileError} showIcon className="mb-4" />}
 
           <form onSubmit={handleProfileSubmit((v) => profileMutation.mutate(v))} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("profile.fullName")}</label>
+              <Controller
+                name="fullName"
+                control={profileControl}
+                rules={{ required: t("validation.required") as string }}
+                render={({ field }) => <Input {...field} />}
+              />
+              {profileErrors.fullName && <p className="text-destructive text-xs mt-1">{profileErrors.fullName.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("profile.phone")}</label>
+              <Controller
+                name="phone"
+                control={profileControl}
+                rules={{
+                  required: t("validation.required") as string,
+                  pattern: { value: PHONE_PATTERN, message: t("validation.invalidPhone") as string },
+                }}
+                render={({ field }) => <Input {...field} placeholder="+212600000000" />}
+              />
+              {profileErrors.phone && <p className="text-destructive text-xs mt-1">{profileErrors.phone.message}</p>}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-1">{t("profile.email")}</label>
               <Controller

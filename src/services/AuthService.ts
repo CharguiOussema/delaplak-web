@@ -11,7 +11,7 @@ export interface AuthResponse {
 class AuthService {
   private readonly base = "/api/auth";
 
-  async signup(payload: { email: string; password: string }): Promise<AuthResponse> {
+  async signup(payload: { email: string; password: string; fullName: string; phone: string }): Promise<AuthResponse> {
     return apiService.post<AuthResponse>(`${this.base}/signup`, payload, { skipAuth: true });
   }
 
@@ -23,7 +23,7 @@ class AuthService {
     return apiService.get<User>(`${this.base}/me`);
   }
 
-  async updateProfile(payload: { email?: string; preferredLanguage?: LANGUAGES }): Promise<User> {
+  async updateProfile(payload: { email?: string; fullName?: string; phone?: string; preferredLanguage?: LANGUAGES }): Promise<User> {
     return apiService.patch<User>(`${this.base}/me`, payload);
   }
 

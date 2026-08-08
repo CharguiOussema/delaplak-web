@@ -28,6 +28,8 @@
 
   "auth.signup.title": "Sign up",
   "auth.signup.subtitle": "Create a client account",
+  "auth.signup.fullNameLabel": "Full name",
+  "auth.signup.phoneLabel": "Phone",
   "auth.signup.confirmPasswordLabel": "Confirm password",
   "auth.signup.passwordMismatch": "Passwords do not match",
   "auth.signup.submit": "Create account",
@@ -36,6 +38,7 @@
 
   "validation.required": "This field is required",
   "validation.minLength": "Must be at least {{count}} characters",
+  "validation.invalidPhone": "Enter a valid phone number",
   "validation.atLeastOneLanguage": "At least one language must be filled in",
 
   "common.actions": "Actions",
@@ -141,6 +144,8 @@
   "invoices.total": "Total",
   "invoices.notFound": "Invoice not found",
 
+  "users.fullName": "Full name",
+  "users.phone": "Phone",
   "users.email": "Email",
   "users.role": "Role",
   "users.status": "Status",
@@ -155,6 +160,8 @@
   "users.deactivateSuccess": "User deactivated",
 
   "profile.title": "My profile",
+  "profile.fullName": "Full name",
+  "profile.phone": "Phone",
   "profile.email": "Email",
   "profile.language": "Preferred language",
   "profile.updateSuccess": "Profile updated",

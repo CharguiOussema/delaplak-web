@@ -1,15 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Button, Empty, InputNumber, Spin, App as AntdApp, Popconfirm, Tag } from "antd";
 import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { cartService } from "../../services/CartService";
-import { queryKeys } from "../../services/QueryClientManager";
-import { useApp } from "../../hooks";
+import { useApp, useAuth, useAuthModal, useCart } from "../../hooks";
 import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
-import type { Cart, CartItem, ProductAttribute } from "../../models/entities";
+import type { CartItem, ProductAttribute } from "../../models/entities";
 import type { Language } from "../../contexts/AppContext";
 
 // Selected options only carry (attribute, option) ids — their display names live on the
@@ -28,34 +25,21 @@ function describeSelectedOptions(item: CartItem, language: Language): string[] {
 export const CartPage = () => {
   const { t } = useTranslation();
   const { language } = useApp();
+  const { isAuthenticated } = useAuth();
+  const { open: openAuthModal } = useAuthModal();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { message } = AntdApp.useApp();
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: [queryKeys.CART],
-    queryFn: () => cartService.getCart(),
-  });
+  const { cart, isLoading, setItemQuantity, removeItem, clear } = useCart();
+  const onError = (err: unknown) => { message.error(getErrorMessage(err)); };
 
-  const invalidate = () => queryClient.invalidateQueries([queryKeys.CART]);
-
-  const updateQty = useMutation<Cart, unknown, { itemId: string; quantity: number }>({
-    mutationFn: ({ itemId, quantity }) => cartService.setItemQuantity(itemId, quantity),
-    onSuccess: invalidate,
-    onError: (err) => { message.error(getErrorMessage(err)); },
-  });
-
-  const removeItem = useMutation<Cart, unknown, string>({
-    mutationFn: (itemId: string) => cartService.removeItem(itemId),
-    onSuccess: invalidate,
-    onError: (err) => { message.error(getErrorMessage(err)); },
-  });
-
-  const clearCart = useMutation<Cart, unknown, void>({
-    mutationFn: () => cartService.clear(),
-    onSuccess: invalidate,
-    onError: (err) => { message.error(getErrorMessage(err)); },
-  });
+  const handleCheckout = () => {
+    if (isAuthenticated) {
+      navigate("/checkout");
+    } else {
+      openAuthModal("login", () => navigate("/checkout"));
+    }
+  };
 
   if (isLoading) {
     return (
@@ -105,14 +89,14 @@ export const CartPage = () => {
                   min={1}
                   max={item.product.stock}
                   value={item.quantity}
-                  onChange={(v) => v && updateQty.mutate({ itemId: item._id, quantity: v })}
+                  onChange={(v) => v && setItemQuantity.mutate({ itemId: item._id, quantity: v }, { onError })}
                 />
                 <div className="w-24 text-end font-semibold">{formatPrice(item.unitPrice * item.quantity, item.product.currency)}</div>
                 <Button
                   type="text"
                   danger
                   icon={<DeleteOutlined />}
-                  onClick={() => removeItem.mutate(item._id)}
+                  onClick={() => removeItem.mutate(item._id, { onError })}
                   loading={removeItem.isLoading}
                 />
               </div>
@@ -120,14 +104,14 @@ export const CartPage = () => {
           </div>
 
           <div className="flex items-center justify-between mt-6">
-            <Popconfirm title={t("cart.clearConfirm")} onConfirm={() => clearCart.mutate()}>
+            <Popconfirm title={t("cart.clearConfirm")} onConfirm={() => clear.mutate(undefined, { onError })}>
               <Button danger>{t("cart.clear")}</Button>
             </Popconfirm>
             <div className="text-end">
               <div className="text-lg font-semibold mb-2">
                 {t("cart.total")}: {formatPrice(total, items[0]?.product.currency || "MAD")}
               </div>
-              <Button type="primary" size="large" icon={<ShoppingOutlined />} onClick={() => navigate("/checkout")}>
+              <Button type="primary" size="large" icon={<ShoppingOutlined />} onClick={handleCheckout}>
                 {t("cart.checkout")}
               </Button>
             </div>

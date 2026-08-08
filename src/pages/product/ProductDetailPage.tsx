@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useQuery } from "react-query";
 import { Spin, Result, Button, InputNumber, Tag, Radio, App as AntdApp, Breadcrumb } from "antd";
 import { ShoppingCartOutlined, LeftOutlined, PictureOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { productService } from "../../services/ProductService";
-import { cartService } from "../../services/CartService";
 import { queryKeys } from "../../services/QueryClientManager";
-import { useApp, useAuth } from "../../hooks";
+import { useApp, useAuth, useCart } from "../../hooks";
 import { RoomPreviewModal } from "../../components/product-preview/RoomPreviewModal";
 import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
 import { USER_ROLES } from "../../models/consts";
-import type { Category, Cart, Product, ProductAttribute } from "../../models/entities";
+import type { Category, Product, ProductAttribute } from "../../models/entities";
 
 interface AttributeGroup {
   attribute: ProductAttribute;
@@ -40,7 +39,7 @@ export const ProductDetailPage = () => {
   const { language } = useApp();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { addItem } = useCart();
   const { message } = AntdApp.useApp();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -81,19 +80,20 @@ export const ProductDetailPage = () => {
     }, product.price);
   }, [product, attributeGroups, selections]);
 
-  const addToCart = useMutation<Cart, unknown, void>({
-    mutationFn: () =>
-      cartService.addItem(
-        id!,
+  const handleAddToCart = () => {
+    if (!product) return;
+    addItem.mutate(
+      {
+        product,
         quantity,
-        attributeGroups.map((group) => ({ attribute: group.attribute._id, option: selections[group.attribute._id] })),
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries([queryKeys.CART]);
-      message.success(t("product.addedToCart"));
-    },
-    onError: (err) => { message.error(getErrorMessage(err)); },
-  });
+        selectedOptions: attributeGroups.map((group) => ({ attribute: group.attribute._id, option: selections[group.attribute._id] })),
+      },
+      {
+        onSuccess: () => { message.success(t("product.addedToCart")); },
+        onError: (err) => { message.error(getErrorMessage(err)); },
+      },
+    );
+  };
 
   if (isLoading) {
     return (
@@ -109,6 +109,8 @@ export const ProductDetailPage = () => {
 
   const category = product.categories.find((c): c is Category => typeof c === "object") ?? null;
   const isClient = user?.role === USER_ROLES.CLIENT;
+  // Guests and signed-in clients can add to cart; staff have no cart.
+  const canUseCart = !user || isClient;
   const allSelected = attributeGroups.every((group) => !!selections[group.attribute._id]);
 
   return (
@@ -211,16 +213,16 @@ export const ProductDetailPage = () => {
             {t("product.stock")}: <span className="font-medium text-foreground">{product.stock}</span>
           </div>
 
-          {isClient && (
+          {canUseCart && (
             <div className="flex items-center gap-3">
               <InputNumber min={1} max={Math.max(product.stock, 1)} value={quantity} onChange={(v) => setQuantity(v || 1)} size="large" />
               <Button
                 type="primary"
                 size="large"
                 icon={<ShoppingCartOutlined />}
-                loading={addToCart.isLoading}
+                loading={addItem.isLoading}
                 disabled={product.stock <= 0 || !allSelected}
-                onClick={() => addToCart.mutate()}
+                onClick={handleAddToCart}
               >
                 {product.stock > 0 ? t("product.addToCart") : t("product.outOfStock")}
               </Button>

@@ -6,17 +6,17 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { QueryClientProvider } from "react-query";
 import { AppProvider } from "./contexts/AppContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { AuthModalProvider } from "./contexts/AuthModalContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProtectedModuleRoute } from "./components/ProtectedModuleRoute";
 import { MainLayout } from "./components/layout/MainLayout";
+import { AuthModal } from "./components/auth/AuthModal";
 import { useApp } from "./hooks";
 import { queryClientManager } from "./services/QueryClientManager";
 import { palette, radius, shadow } from "./theme/tokens";
 
 import { HomePage } from "./pages/home/HomePage";
-import { LoginPage } from "./pages/auth/LoginPage";
-import { SignupPage } from "./pages/auth/SignupPage";
 import { CatalogPage } from "./pages/catalog/CatalogPage";
 import { ProductDetailPage } from "./pages/product/ProductDetailPage";
 import { CartPage } from "./pages/cart/CartPage";
@@ -101,34 +101,13 @@ const AppContent = () => {
     <AntdThemeProvider>
       <Router>
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <ProtectedRoute requireAuth={false}>
-                <LoginPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <ProtectedRoute requireAuth={false}>
-                <SignupPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
+          {/* Home, catalog, product detail and cart are public — anyone can browse and
+              add to cart without an account. Sign in/up happen in a modal (AuthModal),
+              triggered from the Navbar or from a protected action like Checkout. */}
+          <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
-
             <Route
               path="/cart"
               element={
@@ -137,46 +116,55 @@ const AppContent = () => {
                 </ProtectedModuleRoute>
               }
             />
+
             <Route
               path="/checkout"
               element={
-                <ProtectedModuleRoute module="cart">
-                  <CheckoutPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="cart">
+                    <CheckoutPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
 
-            <Route path="/orders" element={<OrdersListPage />} />
-            <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/orders" element={<ProtectedRoute><OrdersListPage /></ProtectedRoute>} />
+            <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
 
-            <Route path="/invoices" element={<InvoicesListPage />} />
-            <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
+            <Route path="/invoices" element={<ProtectedRoute><InvoicesListPage /></ProtectedRoute>} />
+            <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetailPage /></ProtectedRoute>} />
 
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
             {/* users (ADMIN only) */}
             <Route
               path="/users"
               element={
-                <ProtectedModuleRoute module="users">
-                  <UsersListPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="users">
+                    <UsersListPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/users/add"
               element={
-                <ProtectedModuleRoute module="users" writeOnly>
-                  <UserFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="users" writeOnly>
+                    <UserFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/users/:id/edit"
               element={
-                <ProtectedModuleRoute module="users" writeOnly>
-                  <UserFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="users" writeOnly>
+                    <UserFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
 
@@ -184,25 +172,31 @@ const AppContent = () => {
             <Route
               path="/categories"
               element={
-                <ProtectedModuleRoute module="categories">
-                  <CategoriesListPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="categories">
+                    <CategoriesListPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/categories/add"
               element={
-                <ProtectedModuleRoute module="categories" writeOnly>
-                  <CategoryFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="categories" writeOnly>
+                    <CategoryFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/categories/:id/edit"
               element={
-                <ProtectedModuleRoute module="categories" writeOnly>
-                  <CategoryFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="categories" writeOnly>
+                    <CategoryFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
 
@@ -210,25 +204,31 @@ const AppContent = () => {
             <Route
               path="/products"
               element={
-                <ProtectedModuleRoute module="products">
-                  <ProductsListPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="products">
+                    <ProductsListPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/products/add"
               element={
-                <ProtectedModuleRoute module="products" writeOnly>
-                  <ProductFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="products" writeOnly>
+                    <ProductFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/products/:id/edit"
               element={
-                <ProtectedModuleRoute module="products" writeOnly>
-                  <ProductFormPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="products" writeOnly>
+                    <ProductFormPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
 
@@ -236,9 +236,11 @@ const AppContent = () => {
             <Route
               path="/product-attributes"
               element={
-                <ProtectedModuleRoute module="productAttributes">
-                  <ProductAttributesPage />
-                </ProtectedModuleRoute>
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="productAttributes">
+                    <ProductAttributesPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
               }
             />
 
@@ -247,6 +249,7 @@ const AppContent = () => {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <AuthModal />
       </Router>
     </AntdThemeProvider>
   );
@@ -258,7 +261,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <AuthProvider>
-            <AppContent />
+            <AuthModalProvider>
+              <AppContent />
+            </AuthModalProvider>
           </AuthProvider>
         </AppProvider>
       </QueryClientProvider>

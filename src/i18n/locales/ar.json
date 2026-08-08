@@ -28,6 +28,8 @@
 
   "auth.signup.title": "إنشاء حساب",
   "auth.signup.subtitle": "إنشاء حساب عميل",
+  "auth.signup.fullNameLabel": "الاسم الكامل",
+  "auth.signup.phoneLabel": "رقم الهاتف",
   "auth.signup.confirmPasswordLabel": "تأكيد كلمة المرور",
   "auth.signup.passwordMismatch": "كلمتا المرور غير متطابقتين",
   "auth.signup.submit": "إنشاء الحساب",
@@ -36,6 +38,7 @@
 
   "validation.required": "هذا الحقل مطلوب",
   "validation.minLength": "يجب ألا يقل عن {{count}} أحرف",
+  "validation.invalidPhone": "أدخل رقم هاتف صحيح",
   "validation.atLeastOneLanguage": "يجب ملء لغة واحدة على الأقل",
 
   "common.actions": "إجراءات",
@@ -141,6 +144,8 @@
   "invoices.total": "الإجمالي",
   "invoices.notFound": "الفاتورة غير موجودة",
 
+  "users.fullName": "الاسم الكامل",
+  "users.phone": "رقم الهاتف",
   "users.email": "البريد الإلكتروني",
   "users.role": "الدور",
   "users.status": "الحالة",
@@ -155,6 +160,8 @@
   "users.deactivateSuccess": "تم إلغاء تفعيل المستخدم",
 
   "profile.title": "ملفي الشخصي",
+  "profile.fullName": "الاسم الكامل",
+  "profile.phone": "رقم الهاتف",
   "profile.email": "البريد الإلكتروني",
   "profile.language": "اللغة المفضلة",
   "profile.updateSuccess": "تم تحديث الملف الشخصي",

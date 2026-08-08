@@ -9,6 +9,8 @@ export interface I18nText {
 export interface User {
   _id: string;
   email: string;
+  fullName: string;
+  phone: string;
   role: USER_ROLES;
   isActive: boolean;
   preferredLanguage: LANGUAGES;

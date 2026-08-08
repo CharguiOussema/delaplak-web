@@ -43,7 +43,9 @@ export const UsersListPage = () => {
   const canManage = () => canWrite("users");
 
   const columns: TableProps<User>["columns"] = [
+    { title: t("users.fullName"), dataIndex: "fullName" },
     { title: t("users.email"), dataIndex: "email" },
+    { title: t("users.phone"), dataIndex: "phone" },
     { title: t("users.role"), dataIndex: "role", render: (role: USER_ROLES) => <Tag color={ROLE_COLOR[role]}>{role}</Tag> },
     {
       title: t("users.status"),

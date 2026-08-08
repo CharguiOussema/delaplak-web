@@ -139,10 +139,11 @@ const createApiInstance = (): AxiosInstance => {
           (originalRequest.headers as Record<string, string>).Authorization = `Bearer ${newToken}`;
           return instance.request(originalRequest);
         }
-        // Refresh itself failed — clear session and redirect to /login, per arch's existing behavior.
+        // Refresh itself failed — clear session and bounce to the (now public) home page;
+        // sign-in is a modal, not a route, so there's no dedicated /login to redirect to.
         localStorage.removeItem("accessToken");
-        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-          window.location.href = "/login";
+        if (typeof window !== "undefined" && window.location.pathname !== "/") {
+          window.location.href = "/";
         }
       }
 

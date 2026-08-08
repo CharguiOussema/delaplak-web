@@ -11,11 +11,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { useAuth, useApp, useAccess } from "../../hooks";
-import { useQuery } from "react-query";
-import { cartService } from "../../services/CartService";
-import { queryKeys } from "../../services/QueryClientManager";
-import { USER_ROLES } from "../../models/consts";
+import { useAuth, useApp, useAccess, useAuthModal, useCart } from "../../hooks";
 
 const LANGUAGE_LABELS: Record<string, string> = { en: "English", fr: "Français", ar: "العربية" };
 
@@ -24,15 +20,11 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
   const { language, setLanguage, isRTL } = useApp();
   const { isStaff } = useAccess();
+  const { open: openAuthModal } = useAuthModal();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const { data: cart } = useQuery({
-    queryKey: [queryKeys.CART],
-    queryFn: () => cartService.getCart(),
-    enabled: !!user && user.role === USER_ROLES.CLIENT,
-    staleTime: 1000 * 30,
-  });
+  const { cart } = useCart();
   const cartCount = cart?.items?.reduce((sum, it) => sum + it.quantity, 0) ?? 0;
 
   const langMenu: MenuProps = {
@@ -53,7 +45,7 @@ export const Navbar = () => {
       if (key === "profile") navigate("/profile");
       if (key === "logout") {
         await logout();
-        navigate("/login");
+        navigate("/");
       }
     },
   };
@@ -117,7 +109,7 @@ export const Navbar = () => {
             </Button>
           </Dropdown>
 
-          {!isStaff && user && (
+          {!isStaff && (
             <Link to="/cart">
               <Badge count={cartCount} size="small" offset={[-2, 2]}>
                 <Button type="text" shape="circle" icon={<ShoppingCartOutlined className="text-lg" />} />
@@ -130,11 +122,14 @@ export const Navbar = () => {
               <Avatar icon={<UserOutlined />} className="cursor-pointer bg-primary shadow-soft-primary" />
             </Dropdown>
           ) : (
-            <Link to="/login">
-              <Button type="primary" icon={<LockOutlined />} className="btn-pill shadow-soft-primary">
-                {t("auth.login.title")}
-              </Button>
-            </Link>
+            <Button
+              type="primary"
+              icon={<LockOutlined />}
+              className="btn-pill shadow-soft-primary"
+              onClick={() => openAuthModal("login")}
+            >
+              {t("auth.login.title")}
+            </Button>
           )}
 
           <Button

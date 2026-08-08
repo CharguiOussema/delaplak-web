@@ -28,6 +28,8 @@
 
   "auth.signup.title": "Inscription",
   "auth.signup.subtitle": "Créer un compte client",
+  "auth.signup.fullNameLabel": "Nom complet",
+  "auth.signup.phoneLabel": "Téléphone",
   "auth.signup.confirmPasswordLabel": "Confirmer le mot de passe",
   "auth.signup.passwordMismatch": "Les mots de passe ne correspondent pas",
   "auth.signup.submit": "Créer le compte",
@@ -36,6 +38,7 @@
 
   "validation.required": "Ce champ est requis",
   "validation.minLength": "Doit contenir au moins {{count}} caractères",
+  "validation.invalidPhone": "Entrez un numéro de téléphone valide",
   "validation.atLeastOneLanguage": "Au moins une langue doit être renseignée",
 
   "common.actions": "Actions",
@@ -141,6 +144,8 @@
   "invoices.total": "Total",
   "invoices.notFound": "Facture introuvable",
 
+  "users.fullName": "Nom complet",
+  "users.phone": "Téléphone",
   "users.email": "Email",
   "users.role": "Rôle",
   "users.status": "Statut",
@@ -155,6 +160,8 @@
   "users.deactivateSuccess": "Utilisateur désactivé",
 
   "profile.title": "Mon profil",
+  "profile.fullName": "Nom complet",
+  "profile.phone": "Téléphone",
   "profile.email": "Email",
   "profile.language": "Langue préférée",
   "profile.updateSuccess": "Profil mis à jour",

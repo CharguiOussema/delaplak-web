@@ -7,11 +7,15 @@ import type { USER_ROLES } from "../models/consts";
 export interface CreateUserPayload {
   email: string;
   password: string;
+  fullName: string;
+  phone: string;
   role?: USER_ROLES;
 }
 
 export interface UpdateUserPayload {
   email?: string;
+  fullName?: string;
+  phone?: string;
   role?: USER_ROLES;
   isActive?: boolean;
 }

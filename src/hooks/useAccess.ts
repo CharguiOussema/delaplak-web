@@ -14,11 +14,12 @@ export const useAccess = () => {
   const isAdmin = (): boolean => !!user && user.role === USER_ROLES.ADMIN;
 
   const hasAccess = (module: AccessModule): boolean => {
-    if (!user) return false;
     if (module === 'cart') {
-      // Backend's cart router is CLIENT_ONLY — staff get a 403 there.
-      return user.role === USER_ROLES.CLIENT;
+      // Guests browse/add to a local cart; staff have no cart (backend's cart router is
+      // CLIENT_ONLY) — only block signed-in non-CLIENT users (i.e. ADMIN).
+      return !user || user.role === USER_ROLES.CLIENT;
     }
+    if (!user) return false;
     if (module === 'orders' || module === 'invoices') {
       // All authenticated roles can read these (ownership/staff scoping handled server-side).
       return true;

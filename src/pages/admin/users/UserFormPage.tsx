@@ -9,9 +9,13 @@ import { queryKeys } from "../../../services/QueryClientManager";
 import { getErrorMessage } from "../../../utils/errorHandling";
 import { USER_ROLES } from "../../../models/consts";
 
+const PHONE_PATTERN = /^\+?[0-9][0-9\s-]{6,19}$/;
+
 interface UserFormValues {
   email: string;
   password: string;
+  fullName: string;
+  phone: string;
   role: USER_ROLES;
   isActive: boolean;
 }
@@ -37,12 +41,19 @@ export const UserFormPage = () => {
     reset,
     formState: { errors },
   } = useForm<UserFormValues>({
-    defaultValues: { email: "", password: "", role: USER_ROLES.CLIENT, isActive: true },
+    defaultValues: { email: "", password: "", fullName: "", phone: "", role: USER_ROLES.CLIENT, isActive: true },
   });
 
   useEffect(() => {
     if (existing) {
-      reset({ email: existing.email, password: "", role: existing.role, isActive: existing.isActive });
+      reset({
+        email: existing.email,
+        password: "",
+        fullName: existing.fullName,
+        phone: existing.phone,
+        role: existing.role,
+        isActive: existing.isActive,
+      });
     }
   }, [existing, reset]);
 
@@ -51,8 +62,20 @@ export const UserFormPage = () => {
   const mutation = useMutation({
     mutationFn: (values: UserFormValues) =>
       isEdit
-        ? userService.update(id!, { email: values.email, role: values.role, isActive: values.isActive })
-        : userService.create({ email: values.email, password: values.password, role: values.role }),
+        ? userService.update(id!, {
+            email: values.email,
+            fullName: values.fullName,
+            phone: values.phone,
+            role: values.role,
+            isActive: values.isActive,
+          })
+        : userService.create({
+            email: values.email,
+            password: values.password,
+            fullName: values.fullName,
+            phone: values.phone,
+            role: values.role,
+          }),
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.USERS]);
       message.success(isEdit ? t("users.updateSuccess") : t("users.createSuccess"));
@@ -77,6 +100,31 @@ export const UserFormPage = () => {
         {serverError && <Alert type="error" message={serverError} showIcon className="mb-4" />}
 
         <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("users.fullName")}</label>
+            <Controller
+              name="fullName"
+              control={control}
+              rules={{ required: t("validation.required") as string }}
+              render={({ field }) => <Input {...field} />}
+            />
+            {errors.fullName && <p className="text-destructive text-xs mt-1">{errors.fullName.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("users.phone")}</label>
+            <Controller
+              name="phone"
+              control={control}
+              rules={{
+                required: t("validation.required") as string,
+                pattern: { value: PHONE_PATTERN, message: t("validation.invalidPhone") as string },
+              }}
+              render={({ field }) => <Input {...field} placeholder="+212600000000" />}
+            />
+            {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone.message}</p>}
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">{t("users.email")}</label>
             <Controller

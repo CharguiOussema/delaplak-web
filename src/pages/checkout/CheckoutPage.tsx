@@ -1,11 +1,10 @@
 import { useNavigate, Link } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { Button, Empty, Spin, Card, App as AntdApp } from "antd";
 import { useTranslation } from "react-i18next";
-import { cartService } from "../../services/CartService";
 import { orderService } from "../../services/OrderService";
 import { queryKeys } from "../../services/QueryClientManager";
-import { useApp, useAuth } from "../../hooks";
+import { useApp, useAuth, useCart } from "../../hooks";
 import { localize, formatPrice, imageUrl } from "../../utils/i18nText";
 import { API_URL } from "../../constants";
 import { getErrorMessage } from "../../utils/errorHandling";
@@ -19,10 +18,7 @@ export const CheckoutPage = () => {
   const queryClient = useQueryClient();
   const { message } = AntdApp.useApp();
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: [queryKeys.CART],
-    queryFn: () => cartService.getCart(),
-  });
+  const { cart, isLoading } = useCart();
 
   const placeOrder = useMutation<Order, unknown, void>({
     mutationFn: () => orderService.create(),
