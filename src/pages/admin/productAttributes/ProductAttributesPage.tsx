@@ -1,69 +1,18 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Table, Button, Modal, Alert, Popconfirm, App as AntdApp, Empty, Tag } from "antd";
+import { Table, Button, Popconfirm, App as AntdApp, Empty, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { productAttributeService } from "../../../services/ProductAttributeService";
 import { queryKeys } from "../../../services/QueryClientManager";
 import { useApp, useAccess } from "../../../hooks";
-import { I18nFieldGroup, cleanI18nText } from "../../../components/common/I18nFieldGroup";
+import { cleanI18nText } from "../../../components/common/I18nFieldGroup";
+import { NameFormModal } from "../../../components/common/NameFormModal";
 import { localize } from "../../../utils/i18nText";
 import { getErrorMessage } from "../../../utils/errorHandling";
 import type { ProductAttribute, AttributeOption, I18nText } from "../../../models/entities";
 
 const EMPTY_I18N: I18nText = { en: "", fr: "", ar: "" };
-
-interface NameFormValues {
-  name: I18nText;
-}
-
-// Shared by "add attribute type", "rename attribute type", "add option" and "rename option" —
-// all four are a single i18n name field, just wired to a different mutation.
-function NameFormModal({
-  open,
-  title,
-  initialName,
-  submitLabel,
-  loading,
-  serverError,
-  onSubmit,
-  onClose,
-}: {
-  open: boolean;
-  title: string;
-  initialName: I18nText;
-  submitLabel: string;
-  loading: boolean;
-  serverError: string | null;
-  onSubmit: (name: I18nText) => void;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const { control, handleSubmit, reset } = useForm<NameFormValues>({ defaultValues: { name: initialName } });
-
-  return (
-    <Modal
-      title={title}
-      open={open}
-      onCancel={onClose}
-      footer={null}
-      destroyOnClose
-      afterOpenChange={(isOpen) => isOpen && reset({ name: initialName })}
-    >
-      {serverError && <Alert type="error" message={serverError} showIcon className="mb-4" />}
-      <form onSubmit={handleSubmit((v) => onSubmit(v.name))}>
-        <I18nFieldGroup control={control} namePrefix="name" label={t("productAttributes.name") as string} minRequired={1} />
-        <div className="flex gap-3 pt-2 justify-end">
-          <Button onClick={onClose}>{t("common.cancel")}</Button>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            {submitLabel}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
 
 export const ProductAttributesPage = () => {
   const { t } = useTranslation();
@@ -226,7 +175,8 @@ export const ProductAttributesPage = () => {
       <NameFormModal
         open={addAttributeOpen}
         title={t("productAttributes.add") as string}
-        initialName={EMPTY_I18N}
+        fieldLabel={t("productAttributes.name") as string}
+        initialValue={EMPTY_I18N}
         submitLabel={t("common.save") as string}
         loading={createAttribute.isLoading}
         serverError={serverError}
@@ -237,7 +187,8 @@ export const ProductAttributesPage = () => {
       <NameFormModal
         open={!!renameAttribute}
         title={t("productAttributes.edit") as string}
-        initialName={renameAttribute?.name ?? EMPTY_I18N}
+        fieldLabel={t("productAttributes.name") as string}
+        initialValue={renameAttribute?.name ?? EMPTY_I18N}
         submitLabel={t("common.save") as string}
         loading={updateAttribute.isLoading}
         serverError={serverError}
@@ -248,7 +199,8 @@ export const ProductAttributesPage = () => {
       <NameFormModal
         open={!!addOptionFor}
         title={t("productAttributes.addOption") as string}
-        initialName={EMPTY_I18N}
+        fieldLabel={t("productAttributes.name") as string}
+        initialValue={EMPTY_I18N}
         submitLabel={t("common.save") as string}
         loading={addOption.isLoading}
         serverError={serverError}
@@ -259,7 +211,8 @@ export const ProductAttributesPage = () => {
       <NameFormModal
         open={!!renameOption}
         title={t("productAttributes.editOption") as string}
-        initialName={renameOption?.option.name ?? EMPTY_I18N}
+        fieldLabel={t("productAttributes.name") as string}
+        initialValue={renameOption?.option.name ?? EMPTY_I18N}
         submitLabel={t("common.save") as string}
         loading={updateOption.isLoading}
         serverError={serverError}

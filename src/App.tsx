@@ -33,6 +33,8 @@ import { CategoryFormPage } from "./pages/admin/categories/CategoryFormPage";
 import { ProductsListPage } from "./pages/admin/products/ProductsListPage";
 import { ProductFormPage } from "./pages/admin/products/ProductFormPage";
 import { ProductAttributesPage } from "./pages/admin/productAttributes/ProductAttributesPage";
+import { SettingsHubPage } from "./pages/admin/settings/SettingsHubPage";
+import { HomeContentFormPage } from "./pages/admin/settings/HomeContentFormPage";
 import { NotFoundPage } from "./pages/errors/NotFoundPage";
 
 const queryClient = queryClientManager.getQueryClient();
@@ -239,6 +241,28 @@ const AppContent = () => {
                 <ProtectedRoute>
                   <ProtectedModuleRoute module="productAttributes">
                     <ProductAttributesPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* settings hub: home page content + a link into product settings above */}
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="siteSettings">
+                    <SettingsHubPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings/home"
+              element={
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="siteSettings" writeOnly>
+                    <HomeContentFormPage />
                   </ProtectedModuleRoute>
                 </ProtectedRoute>
               }
