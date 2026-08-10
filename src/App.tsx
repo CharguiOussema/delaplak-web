@@ -33,6 +33,7 @@ import { CategoryFormPage } from "./pages/admin/categories/CategoryFormPage";
 import { ProductsListPage } from "./pages/admin/products/ProductsListPage";
 import { ProductFormPage } from "./pages/admin/products/ProductFormPage";
 import { ProductAttributesPage } from "./pages/admin/productAttributes/ProductAttributesPage";
+import { DashboardPage } from "./pages/admin/dashboard/DashboardPage";
 import { SettingsHubPage } from "./pages/admin/settings/SettingsHubPage";
 import { HomeContentFormPage } from "./pages/admin/settings/HomeContentFormPage";
 import { NotFoundPage } from "./pages/errors/NotFoundPage";
@@ -137,6 +138,18 @@ const AppContent = () => {
             <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetailPage /></ProtectedRoute>} />
 
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+            {/* dashboard: KPIs + charts across products/stock/categories/orders/users/invoices */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ProtectedModuleRoute module="dashboard">
+                    <DashboardPage />
+                  </ProtectedModuleRoute>
+                </ProtectedRoute>
+              }
+            />
 
             {/* users (ADMIN only) */}
             <Route

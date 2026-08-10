@@ -71,6 +71,14 @@ export const Navbar = () => {
         {t("navigation.orders")}
       </Link>
       {isStaff && (
+        <Link
+          to="/dashboard"
+          className="rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+        >
+          {t("navigation.dashboard")}
+        </Link>
+      )}
+      {isStaff && (
         <Dropdown
           menu={{
             items: [

@@ -15,6 +15,7 @@ export const queryKeys = {
   ORDERS: "orders",
   INVOICES: "invoices",
   SITE_SETTINGS: "siteSettings",
+  DASHBOARD_STATS: "dashboardStats",
 } as const;
 
 class QueryClientManager {
